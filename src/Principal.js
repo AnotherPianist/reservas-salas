@@ -75,7 +75,9 @@ function Principal() {
                 <Route path='/Sala'>
                   <Edicion_de_salas />
                 </Route>
-
+                <Route path='/Calendario'>
+                  <Calendario />
+                </Route>
                 <Route path='/'></Route>
               </Switch>
             </Box>
