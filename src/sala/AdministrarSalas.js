@@ -16,6 +16,9 @@ import {
 } from 'grommet';
 import BusquedaAvanzada from './BusquedaAvanzada.js';
 import { useState, useEffect } from 'react';
+import Edicion_de_salas from './Edicion_de_salas.js';
+import { Link } from 'react-router-dom';
+import { Trash, Add, View, Edit } from 'grommet-icons';
 function AdministrarSalas() {
   const [busquedaAvanzada, setBusquedaAvanzada] = useState(true);
   const [search, setSearch] = useState('');
@@ -101,6 +104,17 @@ function AdministrarSalas() {
               </AccordionPanel>
             </Accordion>
           </Box>
+          <Box direction='row'>
+            <Box justify='right'>
+              <h1>Lista de salas</h1>
+            </Box>
+            <Box flex></Box>
+            <Box justify='left'>
+              <Link to='/Sala'>
+                <Button icon={<Add />} />
+              </Link>
+            </Box>
+          </Box>
         </Box>
         <Box>
           <Table>
@@ -128,7 +142,15 @@ function AdministrarSalas() {
                   </TableCell>
                   <TableCell>
                     <Button
-                      label='eliminar'
+                      icon={<Edit />}
+                      onClick={() => console.log('edit')}
+                    />
+                    <Button
+                      icon={<View />}
+                      onClick={() => console.log('view')}
+                    />
+                    <Button
+                      icon={<Trash />}
                       onClick={() => eliminarSala(sala)}
                     />
                   </TableCell>

@@ -7,7 +7,7 @@ import reportWebVitals from './reportWebVitals';
 import firebase from 'firebase/app';
 import 'firebase/analytics';
 import UserProvider from './UserProvider';
-import Pricipal from './Principal';
+import Pricipal from './vistas/Principal';
 
 var firebaseConfig = {
   apiKey: 'AIzaSyDT3RmRH7Cgp7Y4zCIH0ythSsmR2OJYHNQ',
