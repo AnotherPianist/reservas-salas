@@ -1,4 +1,6 @@
 import firebase from 'firebase/app';
+import 'firebase/auth';
+import 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -10,6 +12,9 @@ const firebaseConfig = {
   measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
 };
 
-const app = firebase.iinitializeApp(firebaseConfig);
+const app = firebase.initializeApp(firebaseConfig);
+
+export const auth = app.auth();
+export const db = app.firestore();
 
 export default app;

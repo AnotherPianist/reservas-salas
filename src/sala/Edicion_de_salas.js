@@ -176,7 +176,7 @@ function Edicion_de_salas() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {recursosAux.map((rec) => (
+                  {sala.recursos.map((rec) => (
                     <TableRow>
                       <TableCell scope='col'>
                         <Text>{rec.name}</Text>
@@ -218,7 +218,7 @@ function Edicion_de_salas() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {fechasBloquedas.map((fechas) => (
+                  {sala.fechas.map((fechas) => (
                     <TableRow>
                       <TableCell scope='col'>
                         <Text>{fechas.inicio}</Text>

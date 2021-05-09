@@ -1,38 +1,19 @@
-import {
-  Sidebar,
-  Nav,
-  Button,
-  ResponsiveContext,
-  Text,
-  Header,
-  Box
-} from 'grommet';
-import React, { Component } from 'react';
-import {
-  List,
-  Group,
-  Task,
-  Upload,
-  DocumentText,
-  Archive,
-  Menu
-} from 'grommet-icons';
-import { Route, Switch, Link, useHistory } from 'react-router-dom';
+import { Sidebar, Nav, Button, ResponsiveContext } from 'grommet';
+import React from 'react';
+import { Menu } from 'grommet-icons';
+import { Link } from 'react-router-dom';
 
 const items = [
   {
     label: 'Administrar Salas',
-
     path: '/admin'
   },
   {
     label: 'Importar',
-
     path: '/import'
   }
 ];
 function BarraLateral(props) {
-  let history = useHistory();
   const size = React.useContext(ResponsiveContext);
   return (
     <>
