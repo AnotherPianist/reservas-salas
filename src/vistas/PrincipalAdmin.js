@@ -32,7 +32,7 @@ import Landing from '../landing/Landing';
 import { Calendario } from '../calendario/Calendario.js';
 import BarraLateral from '../sidebar/BarraLateral';
 
-function Principal() {
+function PrincipalAdmin() {
   return (
     <Router>
       <Grommet theme={light} full>
@@ -54,7 +54,7 @@ function Principal() {
           <Box direction='column' width='100%'>
             <Box>
               <Switch>
-                <Route path='/admin'>
+                <Route path='/'>
                   <AdministrarSalas />
                 </Route>
                 <Route path='/Sala'>
@@ -73,4 +73,4 @@ function Principal() {
   );
 }
 
-export default Principal;
+export default PrincipalAdmin;
