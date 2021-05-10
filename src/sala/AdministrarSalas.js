@@ -1,5 +1,4 @@
 import {
-  FormField,
   TextInput,
   Table,
   TableHeader,
@@ -9,18 +8,16 @@ import {
   Text,
   Button,
   Box,
-  Layer,
-  DateInput,
   Accordion,
-  AccordionPanel
+  AccordionPanel,
+  Heading
 } from 'grommet';
-import BusquedaAvanzada from './BusquedaAvanzada.js';
+
 import { useState, useEffect } from 'react';
-import Edicion_de_salas from './Edicion_de_salas.js';
 import { Link } from 'react-router-dom';
 import { Trash, Add, View, Edit } from 'grommet-icons';
+import { db } from '../firebase';
 function AdministrarSalas() {
-  const [busquedaAvanzada, setBusquedaAvanzada] = useState(true);
   const [search, setSearch] = useState('');
   const [recurso, setRecurso] = useState('');
   const [cantidad, setCantidad] = useState('');
@@ -54,6 +51,19 @@ function AdministrarSalas() {
       ]
     }
   ]);
+
+  useEffect(() => {
+    db.collection('salas')
+      .get()
+      .then((querySnapshot) => {
+        const temp = [];
+        querySnapshot.forEach((sala) => {
+          temp.push({ id: sala.id, ...sala.data() });
+        });
+        setSalas(temp);
+      });
+  }, []);
+
   const [salasSearch, setSalasSearch] = useState(salas);
 
   const eliminarSala = (sala) => {
@@ -61,105 +71,66 @@ function AdministrarSalas() {
     setSalasSearch((prevRecursos) => prevRecursos.filter((el) => el !== sala));
   };
 
-  const SalaSearch = () => {
+  function searchSala() {
     setSalasSearch(() =>
       salas.filter((x) => x.name.toLowerCase().includes(search.toLowerCase()))
     );
-  };
+  }
+
   return (
     <>
-      <Box direction='column'>
-        <Box>
-          <h1>Administrar salas</h1>
-          <Box direction='row'>
-            <TextInput
-              placeholder='Buscar'
-              id='text-input-id'
-              name='search '
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <Button label='buscar' onClick={() => SalaSearch()}></Button>
-          </Box>
-          <Box>
-            <Accordion
-              onActive={() => (
-                setBusquedaAvanzada(!busquedaAvanzada),
-                console.log(busquedaAvanzada)
-              )}>
-              <AccordionPanel label='Busqueda Avanzada'>
-                <Box direction='row'>
-                  <TextInput
-                    placeholder='Recursos'
-                    id='text-input-id'
-                    name='search '
-                    onChange={(e) => setRecurso(e.target.value)}
-                  />
-                  <TextInput
-                    placeholder='Cantidad'
-                    id='text-input-id'
-                    name='search '
-                    onChange={(e) => setCantidad(e.target.value)}
-                  />
-                </Box>
-              </AccordionPanel>
-            </Accordion>
-          </Box>
-          <Box direction='row'>
-            <Box justify='right'>
-              <h1>Lista de salas</h1>
-            </Box>
-            <Box flex></Box>
-            <Box justify='left'>
-              <Link to='/Sala'>
-                <Button icon={<Add />} />
-              </Link>
-            </Box>
-          </Box>
-        </Box>
-        <Box>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableCell scope='col' border='bottom'>
-                  Nombre
-                </TableCell>
-                <TableCell scope='col' border='bottom'>
-                  Descripción
-                </TableCell>
-                <TableCell scope='col' border='bottom'></TableCell>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {salasSearch.map((sala) => (
-                <TableRow>
-                  <TableCell scope='col'>
-                    <Text>{sala.name}</Text>
-                  </TableCell>
-                  <TableCell scope='col'>
-                    <Text>
-                      <Text>{sala.description}</Text>
-                    </Text>
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      icon={<Edit />}
-                      onClick={() => console.log('edit')}
-                    />
-                    <Button
-                      icon={<View />}
-                      onClick={() => console.log('view')}
-                    />
-                    <Button
-                      icon={<Trash />}
-                      onClick={() => eliminarSala(sala)}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Box>
+      <Heading>Administrar salas</Heading>
+      <Box direction='row'>
+        <TextInput
+          placeholder='Buscar'
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <Button label='Buscar' onClick={() => searchSala()} />
       </Box>
+      <Accordion>
+        <AccordionPanel label='Busqueda Avanzada'>
+          {/** Filtros**/}
+        </AccordionPanel>
+      </Accordion>
+
+      <Heading level='2' margin={{ top: 'xlarge' }}>
+        Lista de salas
+      </Heading>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableCell scope='col' border='bottom'>
+              Nombre
+            </TableCell>
+            <TableCell scope='col' border='bottom'>
+              Descripción
+            </TableCell>
+            <TableCell scope='col' border='bottom'></TableCell>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {salas.map((sala) => (
+            <TableRow>
+              <TableCell scope='col'>
+                <Text>{sala.nombre}</Text>
+              </TableCell>
+              <TableCell scope='col'>
+                <Text>
+                  <Text>{sala.descripcion}</Text>
+                </Text>
+              </TableCell>
+              <TableCell>
+                <Button icon={<Edit />} onClick={() => console.log('edit')} />
+                <Button icon={<View />} onClick={() => console.log('view')} />
+                <Button icon={<Trash />} onClick={() => eliminarSala(sala)} />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      <Link to='/Sala'>
+        <Button icon={<Add />} />
+      </Link>
     </>
   );
 }
