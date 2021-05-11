@@ -20,6 +20,9 @@ function PrincipalAdmin() {
             <Route path='/sala'>
               <Sala />
             </Route>
+            <Route path='/sala/:id'>
+              <Sala />
+            </Route>
             <Route path='/calendario'>
               <Text>Calendario</Text>
             </Route>

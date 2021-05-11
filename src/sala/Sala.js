@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   FormField,
   TextInput,
@@ -11,87 +11,138 @@ import {
   Button,
   Box,
   Layer,
-  DateInput
+  DateInput,
+  Select,
+  Card,
+  CardHeader,
+  CardBody,
+  CardFooter,
+  Heading
 } from 'grommet';
 import { Trash, Add } from 'grommet-icons';
-import { useHistory } from 'react-router-dom';
-function Edicion_de_salas() {
-  const [recursosAux, setRecursos] = useState([
-    { name: 'sillas', cantidad: '3' },
-    { name: 'computador', cantidad: '2' },
-    { name: 'laptop', cantidad: '1' },
-    { name: 'pc', cantidad: '5' }
-  ]);
-  const [fechasBloquedas, setFechasBlock] = useState([
-    { inicio: '01/02/2020', fin: '08/02/2020' },
-    { inicio: '01/03/2020', fin: '08/03/2020' }
-  ]);
+import { useHistory, useParams } from 'react-router-dom';
+import { db } from '../firebase';
 
-  const [sala, setSala] = useState({
-    name: '',
-    description: '',
-    recursos: [
-      { name: 'sillas', cantidad: '3' },
-      { name: 'computador', cantidad: '2' },
-      { name: 'laptop', cantidad: '1' },
-      { name: 'pc', cantidad: '5' }
-    ],
-    fechas: [
-      { inicio: '01/02/2020', fin: '08/02/2020' },
-      { inicio: '01/03/2020', fin: '08/03/2020' }
-    ]
-  });
+function Sala() {
+  const { id } = useParams();
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [type, setType] = useState('');
+  const [recursos, setRecursos] = useState([]);
+  const [fechasBloquedas, setFechasBlock] = useState([]);
   const [showFechas, setshowFechas] = useState();
   const [showRecurso, setshowRecurso] = useState();
-  const [name, setName] = useState();
-  const [description, setDescription] = useState();
-  const eliminarElemento = (rec) => {
+
+  useEffect(() => {
+    if (id) {
+      console.log(id);
+      db.collection('salas')
+        .doc(id)
+        .get()
+        .then((sala) => {
+          const data = sala.data();
+          setName(data.nombre);
+          setDescription(data.descripcion);
+          setType(data.tipo);
+        });
+      db.collection('recursos')
+        .where('idSala', '==', id)
+        .get()
+        .then((querySnapshot) => {
+          const temp = [];
+          querySnapshot.forEach((recurso) => {
+            temp.push({ id: recurso.id, ...recurso.data() });
+          });
+          setRecursos(temp);
+        });
+    }
+  }, [id]);
+
+  function eliminarElemento(rec) {
     setRecursos((prevRecursos) => prevRecursos.filter((el) => el !== rec));
-  };
-  const eliminarFecha = (rec) => {
+  }
+
+  function eliminarFecha(rec) {
     setFechasBlock((prevRecursos) => prevRecursos.filter((el) => el !== rec));
-  };
-  const agregarReccurso = (recurso) => {
+  }
+
+  function agregarRecurso(recurso) {
     setRecursos((prevRecursos) => prevRecursos.concat(recurso));
-  };
-  const agregarFechas = (fechas) => {
+  }
+
+  function agregarFechas(fechas) {
     setFechasBlock((prevRecursos) => prevRecursos.concat(fechas));
-  };
-  const guardarHandler = () => {
-    console.log('guardar');
-  };
+  }
+
+  function guardarHandler() {
+    if (!id) {
+      db.collection('salas')
+        .add({
+          nombre: name,
+          descripcion: description,
+          tipo: type
+        })
+        .then((docRef) => {
+          recursos.forEach((recurso) => {
+            db.collection('recursos').add({
+              idSala: docRef.id,
+              nombre: recurso.name,
+              cantidad: recurso.quantity
+            });
+          });
+        });
+    } else {
+    }
+  }
+
   let history = useHistory();
+
   function Recurso(props) {
-    const [nombre, setNombre] = useState('');
-    const [cantidad, setCantidad] = useState('');
+    const [quantity, setQuantity] = useState('');
+    const [type, setType] = useState('');
+
     return (
-      <>
-        <Text size='xxlarge'>Recurso</Text>
-        <Box>
-          <FormField name='name' htmlFor='text-input-id' label='Nombre'>
-            <TextInput
-              id='text-input-id'
-              name='name'
-              type='email'
-              onChange={(e) => setNombre(e.target.value)}
+      <Layer
+        onEsc={() => setshowRecurso(false)}
+        onClickOutside={() => setshowRecurso(false)}>
+        <Card pad='small'>
+          <CardHeader>
+            <Heading level='3'>Recurso</Heading>
+          </CardHeader>
+          <CardBody>
+            <Text>Tipo de recurso</Text>
+            <Select
+              options={['Computador', 'Proyector', 'Pizarra', 'A/C']}
+              value={type}
+              onChange={({ option }) => setType(option)}
             />
-          </FormField>
-          <FormField name='count' htmlFor='text-input-id' label='Cantidad'>
-            <TextInput
-              name='cantidad'
-              type='Paragraph'
-              onChange={(e) => setCantidad(e.target.value)}
+            <FormField
+              name='count'
+              htmlFor='resource-quantity'
+              label='Cantidad'>
+              <TextInput
+                id='resource-quantity'
+                name='cantidad'
+                min={0}
+                type='number'
+                onChange={(e) => setQuantity(e.target.value)}
+              />
+            </FormField>
+          </CardBody>
+          <CardFooter>
+            <Button
+              label='Guardar'
+              onClick={() => {
+                agregarRecurso({
+                  name: type,
+                  quantity: quantity
+                });
+                setshowRecurso(false);
+              }}
             />
-          </FormField>
-          <Button
-            label='Guardar'
-            onClick={() => (
-              agregarReccurso({ name: nombre, cantidad: cantidad }),
-              setshowRecurso(false)
-            )}
-          />
-        </Box>
-      </>
+          </CardFooter>
+        </Card>
+      </Layer>
     );
   }
 
@@ -99,9 +150,11 @@ function Edicion_de_salas() {
     const [inicio, setInicio] = useState(props.inicio);
     const [fin, setFin] = useState(props.fin);
     return (
-      <>
+      <Layer
+        onEsc={() => setshowFechas(false)}
+        onClickOutside={() => setshowFechas(false)}>
         <Text size='xxlarge'>Fechas</Text>
-        <Box pad='xlarge'>
+        <Box pad='small'>
           <Text>Fecha de inicio</Text>
           <DateInput
             format='dd/mm/yyyy'
@@ -120,45 +173,52 @@ function Edicion_de_salas() {
           />
           <Button
             label='Guardar'
-            onClick={() => (
-              agregarFechas({ inicio: inicio, fin: fin }),
-              setshowFechas(false),
-              console.log(inicio)
-            )}
+            onClick={() => {
+              agregarFechas({ inicio: inicio, fin: fin });
+              setshowFechas(false);
+              console.log(inicio);
+            }}
           />
         </Box>
-      </>
+      </Layer>
     );
   }
 
   return (
     <>
-      {showRecurso && (
-        <Layer
-          onEsc={() => setshowRecurso(false)}
-          onClickOutside={() => setshowRecurso(false)}>
-          <Recurso />
-        </Layer>
-      )}
-      {showFechas && (
-        <Layer
-          onEsc={() => setshowFechas(false)}
-          onClickOutside={() => setshowFechas(false)}>
-          <Fechas />
-        </Layer>
-      )}
+      {showRecurso && <Recurso />}
+      {showFechas && <Fechas />}
       <Box>
         <FormField name='name' htmlFor='text-input-id' label='Nombre'>
-          <TextInput id='text-input-id' name='name' type='email' />
+          <TextInput
+            id='text-input-id'
+            name='name'
+            type='email'
+            onChange={(e) => setName(e.target.value)}
+          />
         </FormField>
-        <FormField name='email' htmlFor='text-input-id' label='Descripción'>
+        <FormField
+          name='description'
+          htmlFor='text-input-id'
+          label='Descripción'>
           <TextInput
             id='text-input-email'
             name='description'
             type='Paragraph'
+            onChange={(e) => setDescription(e.target.value)}
           />
         </FormField>
-
+        <Text size='large'>Tipo</Text>
+        <Select
+          options={[
+            'Laboratorio de Computación',
+            'Laboratorio de Física',
+            'Laboratorio de Química',
+            'Sala'
+          ]}
+          value={type}
+          onChange={({ option }) => setType(option)}
+        />
         <Box pad='large'>
           <Text size='xlarge'>Recursos</Text>
           <Box direction='row' justify='center' align='center'>
@@ -176,14 +236,14 @@ function Edicion_de_salas() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {sala.recursos.map((rec) => (
+                  {recursos.map((rec) => (
                     <TableRow>
                       <TableCell scope='col'>
                         <Text>{rec.name}</Text>
                       </TableCell>
                       <TableCell scope='col'>
                         <Text>
-                          <Text>{rec.cantidad}</Text>
+                          <Text>{rec.quantity}</Text>
                         </Text>
                       </TableCell>
                       <TableCell>
@@ -218,7 +278,7 @@ function Edicion_de_salas() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {sala.fechas.map((fechas) => (
+                  {fechasBloquedas.map((fechas) => (
                     <TableRow>
                       <TableCell scope='col'>
                         <Text>{fechas.inicio}</Text>
@@ -252,7 +312,7 @@ function Edicion_de_salas() {
           label='Guardar'
           onClick={() => {
             guardarHandler();
-            history.replace('/admin');
+            history.replace('/');
           }}
         />
       </Box>
@@ -260,4 +320,4 @@ function Edicion_de_salas() {
   );
 }
 
-export default Edicion_de_salas;
+export default Sala;
