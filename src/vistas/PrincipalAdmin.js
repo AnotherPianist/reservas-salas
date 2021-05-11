@@ -17,7 +17,7 @@ function PrincipalAdmin() {
             <Route exact path='/'>
               <AdministrarSalas />
             </Route>
-            <Route path='/sala'>
+            <Route exact path='/sala'>
               <Sala />
             </Route>
             <Route path='/sala/:id'>

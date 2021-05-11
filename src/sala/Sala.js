@@ -35,18 +35,17 @@ function Sala() {
 
   useEffect(() => {
     if (id) {
-      console.log(id);
-      db.collection('salas')
+      db.collection('rooms')
         .doc(id)
         .get()
         .then((sala) => {
           const data = sala.data();
-          setName(data.nombre);
-          setDescription(data.descripcion);
-          setType(data.tipo);
+          setName(data.name);
+          setDescription(data.description);
+          setType(data.type);
         });
-      db.collection('recursos')
-        .where('idSala', '==', id)
+      db.collection('resources')
+        .where('idRoom', '==', id)
         .get()
         .then((querySnapshot) => {
           const temp = [];
@@ -76,18 +75,18 @@ function Sala() {
 
   function guardarHandler() {
     if (!id) {
-      db.collection('salas')
+      db.collection('rooms')
         .add({
-          nombre: name,
-          descripcion: description,
-          tipo: type
+          name: name,
+          description: description,
+          type: type
         })
         .then((docRef) => {
           recursos.forEach((recurso) => {
-            db.collection('recursos').add({
-              idSala: docRef.id,
-              nombre: recurso.name,
-              cantidad: recurso.quantity
+            db.collection('resources').add({
+              idRoom: docRef.id,
+              name: recurso.name,
+              quantity: recurso.quantity
             });
           });
         });
@@ -192,6 +191,7 @@ function Sala() {
         <FormField name='name' htmlFor='text-input-id' label='Nombre'>
           <TextInput
             id='text-input-id'
+            value={name}
             name='name'
             type='email'
             onChange={(e) => setName(e.target.value)}
@@ -204,6 +204,7 @@ function Sala() {
           <TextInput
             id='text-input-email'
             name='description'
+            value={description}
             type='Paragraph'
             onChange={(e) => setDescription(e.target.value)}
           />

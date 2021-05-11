@@ -24,7 +24,7 @@ function AdministrarSalas() {
   const [salas, setSalas] = useState([]);
 
   useEffect(() => {
-    db.collection('salas').onSnapshot((querySnapshot) => {
+    db.collection('rooms').onSnapshot((querySnapshot) => {
       const temp = [];
       querySnapshot.forEach((sala) => {
         temp.push({ id: sala.id, ...sala.data() });
@@ -39,12 +39,12 @@ function AdministrarSalas() {
     setSalas((prevRecursos) => prevRecursos.filter((el) => el !== sala));
     setSalasSearch((prevRecursos) => prevRecursos.filter((el) => el !== sala));
     const salaId = sala.id;
-    db.collection('salas')
+    db.collection('rooms')
       .doc(salaId)
       .delete()
       .then(() => {
-        db.collection('recursos')
-          .where('idSala', '==', salaId)
+        db.collection('resources')
+          .where('idRoom', '==', salaId)
           .get()
           .then((querySnapshot) => {
             querySnapshot.forEach((resource) => resource.ref.delete());
@@ -93,11 +93,11 @@ function AdministrarSalas() {
           {salas.map((sala) => (
             <TableRow>
               <TableCell scope='col'>
-                <Text>{sala.nombre}</Text>
+                <Text>{sala.name}</Text>
               </TableCell>
               <TableCell scope='col'>
                 <Text>
-                  <Text>{sala.descripcion}</Text>
+                  <Text>{sala.description}</Text>
                 </Text>
               </TableCell>
               <TableCell>
