@@ -1,24 +1,23 @@
-import logo from './logo.svg';
 import './App.css';
+import { Grommet, Image } from 'grommet';
+import PrincipalAdmin from './vistas/PrincipalAdmin';
+import Landing from './landing/Landing.js';
+import { useAuth } from './providers/Auth';
 
 function App() {
+  const { user } = useAuth();
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Grommet full>
+      {user ? (
+        user.admin ? (
+          <PrincipalAdmin />
+        ) : (
+          <Image src='https://web.archive.org/web/20170429030154if_/http://img.pandawhale.com/100953-Michael-Scott-NO-gif-Imgur-C7Xd.gif' />
+        )
+      ) : (
+        <Landing />
+      )}
+    </Grommet>
   );
 }
 
