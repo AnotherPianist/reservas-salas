@@ -32,8 +32,6 @@ function AdministrarSalas() {
   const [ncomputador, setNComputador] = useState(1);
   const [naC, setNAC] = useState(1);
 
-  const [recursos, setRecursos] = useState([]);
-
   useEffect(() => {
     db.collection('rooms').onSnapshot((querySnapshot) => {
       const temp = [];
@@ -69,6 +67,19 @@ function AdministrarSalas() {
       salas.filter((x) => x.name.toLowerCase().includes(search.toLowerCase()))
     );
     if (computador || pizarra || proyector || aC) {
+      var count = 0;
+      if (computador) {
+        count = count + 1;
+      }
+      if (pizarra) {
+        count = count + 1;
+      }
+      if (proyector) {
+        count = count + 1;
+      }
+      if (aC) {
+        count = count + 1;
+      }
       db.collection('resources').onSnapshot((querySnapshot) => {
         const temp = [];
         querySnapshot.forEach((recurso) => {
@@ -87,16 +98,24 @@ function AdministrarSalas() {
               recurso.data().quantity >= naC)
           ) {
             console.log(recurso.quantity);
+
             temp.push(recurso.data().idRoom);
           }
         });
-        console.log(temp);
+        console.log(count);
         const aux = [];
-        salasSearch.forEach((sala) =>
-          temp.forEach((idSala) =>
-            sala.id === idSala ? aux.push(sala) : console.log('no esta')
-          )
-        );
+        var contAux = 0;
+        salasSearch.forEach((sala) => {
+          contAux = 0;
+          temp.forEach((idSala) => {
+            if (sala.id === idSala) {
+              contAux++;
+            }
+          });
+          if (contAux === count) {
+            aux.push(sala);
+          }
+        });
         setSalasSearch(aux);
       });
     }
@@ -123,9 +142,10 @@ function AdministrarSalas() {
               />
 
               <TextInput
+                value={npizarra}
                 id='resource-quantity'
                 name='cantidad'
-                min={0}
+                min={1}
                 type='number'
                 onChange={(e) => setNPizarra(e.target.value)}
               />
@@ -137,9 +157,10 @@ function AdministrarSalas() {
                 onChange={(event) => setProyector(event.target.checked)}
               />
               <TextInput
+                value={nproyector}
                 id='resource-quantity'
                 name='cantidad'
-                min={0}
+                min={1}
                 type='number'
                 onChange={(e) => setNProyector(e.target.value)}
               />
@@ -151,9 +172,10 @@ function AdministrarSalas() {
                 onChange={(event) => setComputador(event.target.checked)}
               />
               <TextInput
+                value={ncomputador}
                 id='resource-quantity'
                 name='cantidad'
-                min={0}
+                min={1}
                 type='number'
                 onChange={(e) => setNComputador(e.target.value)}
               />
@@ -165,9 +187,10 @@ function AdministrarSalas() {
                 onChange={(event) => setAC(event.target.checked)}
               />
               <TextInput
+                value={naC}
                 id='resource-quantity'
                 name='cantidad'
-                min={0}
+                min={1}
                 type='number'
                 onChange={(e) => setNAC(e.target.value)}
               />
