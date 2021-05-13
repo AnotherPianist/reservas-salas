@@ -5,7 +5,7 @@ import Sala from '../sala/Sala';
 import AdministrarSalas from '../sala/AdministrarSalas';
 import BarraLateral from '../layout/BarraLateral';
 import BarraSuperior from '../layout/BarraSuperior';
-import { Calendario } from '../calendario/Calendario';
+import CalendarView from '../calendar/CalendarView';
 
 function PrincipalAdmin() {
   return (
@@ -18,14 +18,14 @@ function PrincipalAdmin() {
             <Route exact path='/'>
               <AdministrarSalas />
             </Route>
-            <Route exact path='/sala'>
+            <Route exact path='/room'>
               <Sala />
             </Route>
-            <Route path='/sala/:id'>
+            <Route path='/room/:id'>
               <Sala />
             </Route>
-            <Route path='/calendario/:roomId'>
-              <Calendario />
+            <Route path='/calendar/:roomId'>
+              <CalendarView />
             </Route>
             <Route exact path='/'></Route>
           </Switch>

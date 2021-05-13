@@ -8,7 +8,7 @@ const items = [
     path: '/'
   },
   {
-    label: 'Exmportar',
+    label: 'Exportar',
     path: '/export'
   }
 ];

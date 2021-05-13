@@ -228,11 +228,11 @@ function AdministrarSalas() {
               <TableCell>
                 <Button
                   icon={<Edit />}
-                  onClick={() => history.push(`/sala/${sala.id}`)}
+                  onClick={() => history.push(`/room/${sala.id}`)}
                 />
                 <Button
                   icon={<View />}
-                  onClick={() => history.push(`/calendario/${sala.id}`)}
+                  onClick={() => history.push(`/calendar/${sala.id}`)}
                 />
                 <Button icon={<Trash />} onClick={() => eliminarSala(sala)} />
               </TableCell>
@@ -240,7 +240,7 @@ function AdministrarSalas() {
           ))}
         </TableBody>
       </Table>
-      <Link to='/sala'>
+      <Link to='/room'>
         <Button icon={<Add />} />
       </Link>
     </>
