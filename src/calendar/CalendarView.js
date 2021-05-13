@@ -60,7 +60,7 @@ function CalendarView() {
   return (
     <Box flex>
       <Calendar
-        views={['work_week']}
+        views={['work_week', 'agenda']}
         defaultView='work_week'
         min={new Date(0, 0, 0, 8, 30, 0)}
         max={new Date(0, 0, 0, 20, 0, 0)}
