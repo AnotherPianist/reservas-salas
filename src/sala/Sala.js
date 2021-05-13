@@ -32,6 +32,8 @@ function Sala() {
   const [fechasBloquedas, setFechasBlock] = useState([]);
   const [showFechas, setshowFechas] = useState();
   const [showRecurso, setshowRecurso] = useState();
+  const [resourcesDeleted, setResourcesDeleted] = useState([]);
+  const [resourcesAdded, setResourcesAdded] = useState([]);
 
   useEffect(() => {
     if (id) {
@@ -59,6 +61,11 @@ function Sala() {
 
   function eliminarElemento(rec) {
     setRecursos((prevRecursos) => prevRecursos.filter((el) => el !== rec));
+    if (id) {
+      const temp = resourcesDeleted.slice();
+      temp.push(rec.id);
+      setResourcesDeleted(temp);
+    }
   }
 
   function eliminarFecha(rec) {
@@ -67,6 +74,9 @@ function Sala() {
 
   function agregarRecurso(recurso) {
     setRecursos((prevRecursos) => prevRecursos.concat(recurso));
+    if (id) {
+      setResourcesAdded((prevRecursos) => prevRecursos.concat(recurso));
+    }
   }
 
   function agregarFechas(fechas) {
@@ -91,6 +101,34 @@ function Sala() {
           });
         });
     } else {
+      //update room
+      var room = db.collection('rooms').doc(id);
+      return (
+        room
+          .update({
+            name: name,
+            description: description,
+            type: type
+          })
+          .then(() => {
+            console.log('Document successfully updated!');
+          })
+          .catch((error) => {
+            console.error('Error updating document: ', error);
+          }),
+        //delete resources
+        resourcesDeleted.forEach((idDelete) =>
+          db.collection('resources').doc(idDelete).delete()
+        ),
+        //add new resources
+        resourcesAdded.forEach((resourcesAdd) =>
+          db.collection('resources').add({
+            idRoom: id,
+            name: resourcesAdd.name,
+            quantity: resourcesAdd.quantity
+          })
+        )
+      );
     }
   }
 
@@ -238,7 +276,7 @@ function Sala() {
                 </TableHeader>
                 <TableBody>
                   {recursos.map((rec) => (
-                    <TableRow>
+                    <TableRow key={rec.i}>
                       <TableCell scope='col'>
                         <Text>{rec.name}</Text>
                       </TableCell>
@@ -263,7 +301,9 @@ function Sala() {
               alignSelf='start'
               onClick={() => setshowRecurso(true)}></Button>
           </Box>
+          {/*
           <Text size='xlarge'>Fechas Bloquedas</Text>
+          
           <Box direction='row' justify='center' align='center'>
             <Box flex border={{ color: 'brand', size: 'small' }}>
               <Table>
@@ -307,7 +347,9 @@ function Sala() {
               alignSelf='start'
             />
           </Box>
+          */}
         </Box>
+
         <Button
           alignSelf='end'
           label='Guardar'

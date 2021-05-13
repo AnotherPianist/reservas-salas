@@ -8,8 +8,8 @@ const items = [
     path: '/'
   },
   {
-    label: 'Importar',
-    path: '/import'
+    label: 'Exmportar',
+    path: '/export'
   }
 ];
 
@@ -17,7 +17,7 @@ function BarraLateral() {
   return (
     <Sidebar background='#02475e' width='12rem'>
       {items.map((item) => (
-        <Nav>
+        <Nav key={item.label}>
           <Link style={{ color: 'inherit' }} to={item.path}>
             <Button plain={true} label={item.label} />
           </Link>

@@ -1,8 +1,10 @@
+import React from 'react';
 import { Button, Header } from 'grommet';
 import { Home } from 'grommet-icons';
 import { Link } from 'react-router-dom';
 import useAuth from '../providers/Auth';
 import { useHistory } from 'react-router-dom';
+
 function BarraSuperior(props) {
   const { logout } = useAuth();
   let history = useHistory();
