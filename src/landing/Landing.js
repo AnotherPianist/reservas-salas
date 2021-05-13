@@ -45,7 +45,7 @@ function Landing() {
           width='auto'>
           <Box>
             <Box margin='auto' width='auto' justify='center' pad='medium'>
-              <Box pad='medium'>
+              <Box pad='medium' align='center'>
                 <Heading margin='none' level='2'>
                   Reserva de Salas
                 </Heading>
@@ -55,62 +55,60 @@ function Landing() {
               </Box>
             </Box>
 
-            <Box justify='right'>
-              <Box width='auto'>
-                {loading ? (
-                  <Box align='center'>
-                    <Spinner margin='medium' size='large' />
-                  </Box>
-                ) : (
-                  <>
-                    <CardHeader justify='center'>
-                      <Heading level='3'>Iniciar sesión</Heading>
-                    </CardHeader>
-                    <Form onSubmit={handleOnSubmit}>
-                      <CardBody pad='medium'>
-                        {error && (
-                          <Text margin='small' color='status-critical'>
-                            Error iniciando sesión. Por favor revise sus
-                            credenciales.
-                          </Text>
-                        )}
-                        <FormField
+            <Box width='auto'>
+              {loading ? (
+                <Box align='center'>
+                  <Spinner margin='medium' size='large' />
+                </Box>
+              ) : (
+                <>
+                  <CardHeader justify='center'>
+                    <Heading level='3'>Iniciar sesión</Heading>
+                  </CardHeader>
+                  <Form onSubmit={handleOnSubmit}>
+                    <CardBody pad='medium'>
+                      {error && (
+                        <Text margin='small' color='status-critical'>
+                          Error iniciando sesión. Por favor revise sus
+                          credenciales.
+                        </Text>
+                      )}
+                      <FormField
+                        name='email'
+                        htmlFor='text-input-email'
+                        label='Email'
+                        required>
+                        <TextInput
+                          id='text-input-email'
                           name='email'
-                          htmlFor='text-input-email'
-                          label='Email'
-                          required>
-                          <TextInput
-                            id='text-input-email'
-                            name='email'
-                            type='email'
-                            onChange={(e) => setEmail(e.target.value)}
-                          />
-                        </FormField>
-                        <FormField
-                          name='password'
-                          htmlFor='text-input-password'
-                          label='Contraseña'
-                          required>
-                          <TextInput
-                            id='text-input-password'
-                            name='password'
-                            type='password'
-                            onChange={(e) => setPassword(e.target.value)}
-                          />
-                        </FormField>
-                      </CardBody>
-                      <CardFooter pad='small' justify='center'>
-                        <Button
-                          type='submit'
-                          primary
-                          label='Ingresar'
-                          color='brand'
+                          type='email'
+                          onChange={(e) => setEmail(e.target.value)}
                         />
-                      </CardFooter>
-                    </Form>
-                  </>
-                )}
-              </Box>
+                      </FormField>
+                      <FormField
+                        name='password'
+                        htmlFor='text-input-password'
+                        label='Contraseña'
+                        required>
+                        <TextInput
+                          id='text-input-password'
+                          name='password'
+                          type='password'
+                          onChange={(e) => setPassword(e.target.value)}
+                        />
+                      </FormField>
+                    </CardBody>
+                    <CardFooter pad='small' justify='center'>
+                      <Button
+                        type='submit'
+                        primary
+                        label='Ingresar'
+                        color='brand'
+                      />
+                    </CardFooter>
+                  </Form>
+                </>
+              )}
             </Box>
           </Box>
         </Card>
