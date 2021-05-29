@@ -9,7 +9,7 @@ function BarraSuperior(props) {
   const { logout } = useAuth();
   let history = useHistory();
   return (
-    <Header background='#02475e'>
+    <Header background='#02475e' height='100%'>
       <Button icon={<Home />} />
       <Button
         primary

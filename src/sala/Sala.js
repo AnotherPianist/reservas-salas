@@ -22,6 +22,7 @@ import {
 import { Trash, Add } from 'grommet-icons';
 import { useHistory, useParams } from 'react-router-dom';
 import { db } from '../firebase';
+import ResourceSelect from '../components/ResourceSelect';
 
 function Sala() {
   const { id } = useParams();
@@ -148,11 +149,19 @@ function Sala() {
           </CardHeader>
           <CardBody>
             <Text>Tipo de recurso</Text>
-            <Select
-              options={['Computador', 'Proyector', 'Pizarra', 'A/C']}
-              value={type}
-              onChange={({ option }) => setType(option)}
-            />
+            <FormField
+              name='company-name'
+              htmlFor='company-name'
+              label='Nombre de la empresa'>
+              <ResourceSelect
+                id='company-name'
+                name='company-name'
+                onParentChange={(newValue) => {
+                  setType(newValue.label);
+                }}
+              />
+            </FormField>
+
             <FormField
               name='count'
               htmlFor='resource-quantity'
@@ -225,7 +234,7 @@ function Sala() {
     <>
       {showRecurso && <Recurso />}
       {showFechas && <Fechas />}
-      <Box>
+      <Box responsive>
         <FormField name='name' htmlFor='text-input-id' label='Nombre'>
           <TextInput
             id='text-input-id'
@@ -258,10 +267,17 @@ function Sala() {
           value={type}
           onChange={({ option }) => setType(option)}
         />
-        <Box pad='large'>
-          <Text size='xlarge'>Recursos</Text>
-          <Box direction='row' justify='center' align='center'>
-            <Box width='auto' flex border={{ color: 'brand', size: 'small' }}>
+        <Box pad='large' direction='column'>
+          <Box justify='start' align='start'>
+            <Text size='xlarge'>Recursos</Text>
+          </Box>
+          <Box direction='row' justify='start' align='center'>
+            <Box
+              overflow='scroll'
+              width='auto'
+              height='small'
+              flex
+              border={{ color: 'brand', size: 'small' }}>
               <Table>
                 <TableHeader>
                   <TableRow>

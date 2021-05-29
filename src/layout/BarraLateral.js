@@ -15,7 +15,7 @@ const items = [
 
 function BarraLateral() {
   return (
-    <Sidebar background='#02475e' width='12rem'>
+    <Sidebar background='#02475e'>
       {items.map((item) => (
         <Nav key={item.label}>
           <Link style={{ color: 'inherit' }} to={item.path}>

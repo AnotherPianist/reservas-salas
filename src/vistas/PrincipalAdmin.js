@@ -9,11 +9,15 @@ import CalendarView from '../calendar/CalendarView';
 
 function PrincipalAdmin() {
   return (
-    <>
-      <BarraSuperior />
-      <Box direction='row' fill>
-        <BarraLateral />
-        <Box width='100%' pad='large'>
+    <Box direction='column' height='100%'>
+      <Box height='7%'>
+        <BarraSuperior />
+      </Box>
+      <Box direction='row' height='90%' fill>
+        <Box width='10%'>
+          <BarraLateral />
+        </Box>
+        <Box width='93%' height='100%' pad='large'>
           <Switch>
             <Route exact path='/'>
               <AdministrarSalas />
@@ -31,7 +35,7 @@ function PrincipalAdmin() {
           </Switch>
         </Box>
       </Box>
-    </>
+    </Box>
   );
 }
 
