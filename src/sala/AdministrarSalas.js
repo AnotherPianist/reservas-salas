@@ -1,22 +1,5 @@
-import {
-  TextInput,
-  Table,
-  TableHeader,
-  TableRow,
-  TableCell,
-  TableBody,
-  Text,
-  Button,
-  Box,
-  AccordionPanel,
-  Heading,
-  CheckBox,
-  Tip,
-  Select
-} from 'grommet';
 import { useState, useEffect } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { Trash, Add, Calendar, Edit } from 'grommet-icons';
 import { db } from '../firebase';
 import {
   Grid,
@@ -28,10 +11,27 @@ import {
   AccordionDetails,
   FormControl,
   InputLabel,
-  MenuItem
+  MenuItem,
+  Select,
+  TableHead,
+  Table,
+  TableRow,
+  TableCell,
+  TableBody,
+  Tooltip,
+  Button
+
   //Select
 } from '@material-ui/core';
-import { ExpandMore, Search } from '@material-ui/icons';
+import {
+  CalendarToday,
+  Delete,
+  ExpandMore,
+  Search,
+  Add,
+  Edit
+} from '@material-ui/icons';
+import React from 'react';
 
 function AdministrarSalas() {
   let history = useHistory();
@@ -123,6 +123,7 @@ function AdministrarSalas() {
 
   function searchSala() {
     const searchOptionsAux = [];
+    console.log(searchOptions);
     for (let index = 0; index < searchOptions.length; index++) {
       const element = searchOptions[index];
       if (element.resource !== '' && element.minAmount !== '0') {
@@ -162,9 +163,7 @@ function AdministrarSalas() {
       setSalasSearch(
         aux.filter((x) => x.name.toLowerCase().includes(search.toLowerCase()))
       );
-      //setSalasSearch((prev) =>
-      //  prev.filter((x) => x.name.toLowerCase().includes(search.toLowerCase()))
-      //);
+
       setFlag(true);
     } else {
       const aux = salas;
@@ -177,7 +176,7 @@ function AdministrarSalas() {
   return (
     <Grid container spacing={3} direction='column'>
       <Grid item xs={12}>
-        <Heading>Administrar salas</Heading>
+        <Typography variant='h2'>Administrar salas</Typography>
       </Grid>
       <Grid container>
         <Grid item xs>
@@ -194,7 +193,7 @@ function AdministrarSalas() {
           </IconButton>
         </Grid>
       </Grid>
-      <Grid container>
+      <Grid container style={{ width: '100%' }}>
         <Accordion>
           <AccordionSummary
             expandIcon={<ExpandMore />}
@@ -218,40 +217,35 @@ function AdministrarSalas() {
                         <InputLabel id='select-resource-label'>
                           Recurso
                         </InputLabel>
-                        {/*<Select
+                        <Select
                           labelId='select-resource-label'
                           id='select-resource'
                           value={searchOption.resource}
-                          onChange={({ option }) =>
-                            editSearch(i, 'resource', option)
-                          }>
+                          onChange={(e) => (
+                            editSearch(i, 'resource', e.target.value),
+                            console.log(e.target.value)
+                          )}>
                           {options.map((option) => (
                             <MenuItem value={option}>{option}</MenuItem>
                           ))}
                         </Select>
-                          */}
                       </FormControl>
-                      <Select
-                        placeholder='Recurso'
-                        options={options}
-                        value={searchOption.resource}
-                        onChange={({ option }) =>
-                          editSearch(i, 'resource', option)
-                        }
-                      />
                     </Grid>
                     <Grid item xs>
                       <TextField
                         id='coun-resource'
-                        label='Cantidad Minima'
+                        label='cant. Min'
                         type='number'
-                        onChange={(e) => console.log(e.target.value)}
+                        onChange={(e) => (
+                          editSearch(i, 'minAmount', e.target.value),
+                          console.log(e.target.value)
+                        )}
                       />
                     </Grid>
                     <Grid item xs>
-                      <Button
-                        onClick={() => hadlerDelete(searchOption)}
-                        icon={<Trash />}></Button>
+                      <IconButton onClick={() => hadlerDelete(searchOption)}>
+                        <Delete />
+                      </IconButton>
                     </Grid>
                   </Grid>
                 </Grid>
@@ -263,19 +257,17 @@ function AdministrarSalas() {
                     prev.concat({ resource: '', minAmount: '0' })
                   )
                 }
-                icon={<Add />}></Button>
+                startIcon={<Add />}></Button>
             </Grid>
           </AccordionDetails>
         </Accordion>
       </Grid>
 
-      <Heading level='2' margin={{ top: 'xlarge' }}>
-        Lista de salas
-      </Heading>
+      <Typography variant='h2'>Lista de salas</Typography>
 
       <Grid>
         <Table>
-          <TableHeader>
+          <TableHead>
             <TableRow>
               <TableCell scope='col' border='bottom'>
                 Nombre
@@ -285,17 +277,18 @@ function AdministrarSalas() {
               </TableCell>
               <TableCell scope='col' border='bottom'></TableCell>
             </TableRow>
-          </TableHeader>
+          </TableHead>
           <TableBody>
             {salasSearch.map((sala) => (
               <TableRow>
                 <TableCell scope='col'>
-                  <Tip
-                    background='white'
-                    content={
-                      <Box>
+                  <Tooltip
+                    style={{ backgroundColor: 'white' }}
+                    placement='right'
+                    title={
+                      <Grid>
                         <Table>
-                          <TableHeader>
+                          <TableHead>
                             <TableRow>
                               <TableCell scope='col' border='bottom'>
                                 Recurso
@@ -304,45 +297,45 @@ function AdministrarSalas() {
                                 Cantidad
                               </TableCell>
                             </TableRow>
-                          </TableHeader>
+                          </TableHead>
                         </Table>
                         <TableBody>
                           {resource.map((rec) =>
                             rec.idRoom === sala.id ? (
                               <TableRow key={rec.i}>
                                 <TableCell scope='col'>
-                                  <Text>{rec.name}</Text>
+                                  <Typography>{rec.name}</Typography>
                                 </TableCell>
                                 <TableCell scope='col'>
-                                  <Text>
-                                    <Text>{rec.quantity}</Text>
-                                  </Text>
+                                  <Typography>
+                                    <Typography>{rec.quantity}</Typography>
+                                  </Typography>
                                 </TableCell>
                               </TableRow>
                             ) : null
                           )}
                         </TableBody>
-                      </Box>
+                      </Grid>
                     }>
-                    <Text>{sala.name}</Text>
-                  </Tip>
+                    <Typography>{sala.name}</Typography>
+                  </Tooltip>
                 </TableCell>
                 <TableCell scope='col'>
-                  <Text>
-                    <Text>{sala.description}</Text>
-                  </Text>
+                  <Typography>
+                    <Typography>{sala.description}</Typography>
+                  </Typography>
                 </TableCell>
                 <TableCell>
-                  <Button
-                    icon={<Calendar />}
-                    onClick={() => history.push(`/calendar/${sala.id}`)}
-                  />
-                  <Button
-                    icon={<Edit />}
-                    onClick={() => history.push(`/room/${sala.id}`)}
-                  />
-
-                  <Button icon={<Trash />} onClick={() => eliminarSala(sala)} />
+                  <IconButton
+                    onClick={() => history.push(`/calendar/${sala.id}`)}>
+                    <CalendarToday />
+                  </IconButton>
+                  <IconButton onClick={() => history.push(`/room/${sala.id}`)}>
+                    <Edit />
+                  </IconButton>
+                  <IconButton onClick={() => eliminarSala(sala)}>
+                    <Delete />
+                  </IconButton>
                 </TableCell>
               </TableRow>
             ))}
@@ -351,7 +344,7 @@ function AdministrarSalas() {
       </Grid>
 
       <Link to='/room'>
-        <Button icon={<Add />} />
+        <Button startIcon={<Add />} />
       </Link>
     </Grid>
   );

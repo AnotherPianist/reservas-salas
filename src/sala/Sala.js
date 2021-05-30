@@ -1,28 +1,26 @@
 import { useEffect, useState } from 'react';
-import {
-  FormField,
-  TextInput,
-  Table,
-  TableHeader,
-  TableRow,
-  TableCell,
-  TableBody,
-  Text,
-  Button,
-  Box,
-  Layer,
-  DateInput,
-  Select,
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  Heading
-} from 'grommet';
-import { Trash, Add } from 'grommet-icons';
 import { useHistory, useParams } from 'react-router-dom';
 import { db } from '../firebase';
 import ResourceSelect from '../components/ResourceSelect';
+import {
+  TableHead,
+  Table,
+  TableRow,
+  TableCell,
+  TableBody,
+  Grid,
+  TextField,
+  Select,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Button,
+  IconButton,
+  Typography,
+  Modal,
+  Box
+} from '@material-ui/core';
+import { Delete, Save, Add } from '@material-ui/icons';
 
 function Sala() {
   const { id } = useParams();
@@ -35,18 +33,10 @@ function Sala() {
   const [showRecurso, setshowRecurso] = useState();
   const [resourcesDeleted, setResourcesDeleted] = useState([]);
   const [resourcesAdded, setResourcesAdded] = useState([]);
+  const [flag, setFlag] = useState(false);
 
   useEffect(() => {
     if (id) {
-      db.collection('rooms')
-        .doc(id)
-        .get()
-        .then((sala) => {
-          const data = sala.data();
-          setName(data.name);
-          setDescription(data.description);
-          setType(data.type);
-        });
       db.collection('resources')
         .where('idRoom', '==', id)
         .get()
@@ -57,8 +47,23 @@ function Sala() {
           });
           setRecursos(temp);
         });
+      db.collection('rooms')
+        .doc(id)
+        .get()
+        .then((sala) => {
+          const data = sala.data();
+          setName(data.name);
+          setDescription(data.description);
+          setType(data.type);
+        });
+
+      setFlag(true);
     }
-  }, [id]);
+  }, []);
+
+  useEffect(() => {
+    setFlag(false);
+  }, [flag]);
 
   function eliminarElemento(rec) {
     setRecursos((prevRecursos) => prevRecursos.filter((el) => el !== rec));
@@ -140,58 +145,48 @@ function Sala() {
     const [type, setType] = useState('');
 
     return (
-      <Layer
-        onEsc={() => setshowRecurso(false)}
-        onClickOutside={() => setshowRecurso(false)}>
-        <Card pad='small'>
-          <CardHeader>
-            <Heading level='3'>Recurso</Heading>
-          </CardHeader>
-          <CardBody>
-            <Text>Tipo de recurso</Text>
-            <FormField
-              name='company-name'
-              htmlFor='company-name'
-              label='Nombre de la empresa'>
-              <ResourceSelect
-                id='company-name'
-                name='company-name'
-                onParentChange={(newValue) => {
-                  setType(newValue.label);
-                }}
-              />
-            </FormField>
+      <Modal
+        open={showRecurso}
+        onClose={() => setshowRecurso(false)}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+        <Box bgcolor='white' padding={8}>
+          <Typography variant='h5'>Resurso</Typography>
 
-            <FormField
-              name='count'
-              htmlFor='resource-quantity'
-              label='Cantidad'>
-              <TextInput
-                id='resource-quantity'
-                name='cantidad'
-                min={0}
-                type='number'
-                onChange={(e) => setQuantity(e.target.value)}
-              />
-            </FormField>
-          </CardBody>
-          <CardFooter>
-            <Button
-              label='Guardar'
-              onClick={() => {
-                agregarRecurso({
-                  name: type,
-                  quantity: quantity
-                });
-                setshowRecurso(false);
-              }}
-            />
-          </CardFooter>
-        </Card>
-      </Layer>
+          <ResourceSelect
+            id='company-name'
+            name='company-name'
+            onParentChange={(newValue) => {
+              setType(newValue.label);
+            }}
+          />
+
+          <TextField
+            id='coun-resource'
+            label='Cantidad'
+            type='number'
+            onChange={(e) => setQuantity(e.target.value)}
+          />
+
+          <IconButton
+            onClick={() => {
+              agregarRecurso({
+                name: type,
+                quantity: quantity
+              });
+              setshowRecurso(false);
+            }}>
+            <Save />
+          </IconButton>
+        </Box>
+      </Modal>
     );
   }
-
+  {
+    /*
   function Fechas(props) {
     const [inicio, setInicio] = useState(props.inicio);
     const [fin, setFin] = useState(props.fin);
@@ -199,182 +194,154 @@ function Sala() {
       <Layer
         onEsc={() => setshowFechas(false)}
         onClickOutside={() => setshowFechas(false)}>
-        <Text size='xxlarge'>Fechas</Text>
-        <Box pad='small'>
-          <Text>Fecha de inicio</Text>
-          <DateInput
-            format='dd/mm/yyyy'
-            value={inicio}
-            onChange={({ value }) => {
-              setInicio(value);
-            }}
-          />
-          <Text>Fecha de fin</Text>
-          <DateInput
-            format='dd/mm/yyyy'
-            value={fin}
-            onChange={({ value }) => {
-              setFin(value);
-            }}
-          />
-          <Button
-            label='Guardar'
-            onClick={() => {
-              agregarFechas({ inicio: inicio, fin: fin });
-              setshowFechas(false);
-              console.log(inicio);
-            }}
-          />
-        </Box>
+        <Typography variant='h5'>Fechas</Typography>
+
+        <Typography variant='h6'>Fecha de inicio</Typography>
+        <DateInput
+          format='dd/mm/yyyy'
+          value={inicio}
+          onChange={({ value }) => {
+            setInicio(value);
+          }}
+        />
+        <Typography variant='h6'>Fecha de Fin</Typography>
+        <DateInput
+          format='dd/mm/yyyy'
+          value={fin}
+          onChange={({ value }) => {
+            setFin(value);
+          }}
+        />
+        <Button
+          label='Guardar'
+          onClick={() => {
+            agregarFechas({ inicio: inicio, fin: fin });
+            setshowFechas(false);
+            console.log(inicio);
+          }}
+        />
       </Layer>
     );
+  }*/
   }
 
   return (
     <>
       {showRecurso && <Recurso />}
-      {showFechas && <Fechas />}
-      <Box responsive>
-        <FormField name='name' htmlFor='text-input-id' label='Nombre'>
-          <TextInput
-            id='text-input-id'
+
+      <Grid container direction='column' spacing={4}>
+        {/*Input name*/}
+        <Grid item>
+          <TextField
+            fullWidth
+            variant='outlined'
+            defaultValue={name}
             value={name}
-            name='name'
-            type='email'
+            id='name'
+            label='Nombre'
             onChange={(e) => setName(e.target.value)}
           />
-        </FormField>
-        <FormField
-          name='description'
-          htmlFor='text-input-id'
-          label='Descripción'>
-          <TextInput
-            id='text-input-email'
-            name='description'
+        </Grid>
+        {/*Input description*/}
+        <Grid item>
+          <TextField
+            fullWidth
+            multiline
+            variant='outlined'
+            defaultValue={description}
             value={description}
-            type='Paragraph'
+            rowsMax={4}
+            id='name'
+            label='Descripción'
             onChange={(e) => setDescription(e.target.value)}
           />
-        </FormField>
-        <Text size='large'>Tipo</Text>
-        <Select
-          options={[
-            'Laboratorio de Computación',
-            'Laboratorio de Física',
-            'Laboratorio de Química',
-            'Sala'
-          ]}
-          value={type}
-          onChange={({ option }) => setType(option)}
-        />
-        <Box pad='large' direction='column'>
-          <Box justify='start' align='start'>
-            <Text size='xlarge'>Recursos</Text>
-          </Box>
-          <Box direction='row' justify='start' align='center'>
-            <Box
-              overflow='scroll'
-              width='auto'
-              height='small'
-              flex
-              border={{ color: 'brand', size: 'small' }}>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableCell scope='col' border='bottom'>
-                      Recurso
-                    </TableCell>
-                    <TableCell scope='col' border='bottom'>
-                      Cantidad
-                    </TableCell>
-                    <TableCell scope='col' border='bottom'></TableCell>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {recursos.map((rec) => (
-                    <TableRow key={rec.i}>
-                      <TableCell scope='col'>
-                        <Text>{rec.name}</Text>
-                      </TableCell>
-                      <TableCell scope='col'>
-                        <Text>
-                          <Text>{rec.quantity}</Text>
-                        </Text>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          icon={<Trash />}
-                          onClick={() => eliminarElemento(rec)}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Box>
-            <Button
-              icon={<Add />}
-              alignSelf='start'
-              onClick={() => setshowRecurso(true)}></Button>
-          </Box>
-          {/*
-          <Text size='xlarge'>Fechas Bloquedas</Text>
-          
-          <Box direction='row' justify='center' align='center'>
-            <Box flex border={{ color: 'brand', size: 'small' }}>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableCell scope='col' border='bottom'>
-                      Fecha Inicio
-                    </TableCell>
-                    <TableCell scope='col' border='bottom'>
-                      Fecha Fin
-                    </TableCell>
-                    <TableCell scope='col' border='bottom'></TableCell>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {fechasBloquedas.map((fechas) => (
+        </Grid>
+        {/*Select type*/}
+
+        <Grid item>
+          <Grid container></Grid>
+        </Grid>
+
+        <Grid item>
+          <FormControl fullWidth>
+            <InputLabel id='select-resource-label'>Tipo</InputLabel>
+            <Select
+              labelId='select-type-label'
+              id='select-type'
+              value={type}
+              onChange={(e) => setType(e.target.value)}>
+              <MenuItem value={'Laboratorio de Computación'}>
+                Laboratorio de Computación
+              </MenuItem>
+              <MenuItem value={'Laboratorio de Física'}>
+                Laboratorio de Física
+              </MenuItem>
+              <MenuItem value={'Laboratorio de Química'}>
+                Laboratorio de Química
+              </MenuItem>
+              <MenuItem value={'Sala'}>Sala</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+
+        {/*table resourse*/}
+        <Grid item>
+          <Grid container direction='column'>
+            <Grid item>
+              <Typography size='xlarge'>Recursos</Typography>
+            </Grid>
+            <Grid item>
+              <Grid>
+                <Table>
+                  <TableHead>
                     <TableRow>
-                      <TableCell scope='col'>
-                        <Text>{fechas.inicio}</Text>
+                      <TableCell scope='col' border='bottom'>
+                        Recurso
                       </TableCell>
-                      <TableCell scope='col'>
-                        <Text>
-                          <Text>{fechas.fin}</Text>
-                        </Text>
+                      <TableCell scope='col' border='bottom'>
+                        Cantidad
                       </TableCell>
-                      <TableCell scope='col'>
-                        <Button
-                          icon={<Trash />}
-                          onClick={() => eliminarFecha(fechas)}
-                        />
-                      </TableCell>
+                      <TableCell scope='col' border='bottom'></TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Box>
+                  </TableHead>
+                  <TableBody>
+                    {recursos.map((rec) => (
+                      <TableRow key={rec.i}>
+                        <TableCell scope='col'>
+                          <Typography>{rec.name}</Typography>
+                        </TableCell>
+                        <TableCell scope='col'>
+                          <Typography>{rec.quantity}</Typography>
+                        </TableCell>
+                        <TableCell>
+                          <IconButton onClick={() => eliminarElemento(rec)}>
+                            <Delete />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
 
-            <Button
-              icon={<Add />}
-              onClick={() => setshowFechas(true)}
-              alignSelf='start'
-            />
-          </Box>
-          */}
-        </Box>
-
-        <Button
-          alignSelf='end'
-          label='Guardar'
-          onClick={() => {
-            guardarHandler();
-            history.replace('/');
-          }}
-        />
-      </Box>
+                <Button
+                  startIcon={<Add />}
+                  alignSelf='start'
+                  onClick={() => setshowRecurso(true)}></Button>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+        {/*button save*/}
+        <Grid item>
+          <IconButton
+            onClick={() => {
+              guardarHandler();
+              history.replace('/');
+            }}>
+            <Save />
+          </IconButton>
+        </Grid>
+      </Grid>
     </>
   );
 }
