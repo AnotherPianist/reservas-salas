@@ -1,30 +1,41 @@
 import React, { useState } from 'react';
-import {
-  Box,
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  Form,
-  FormField,
-  Heading,
-  Main,
-  Spinner,
-  Text,
-  TextInput
-} from 'grommet';
 import useAuth from '../providers/Auth';
-
+import {
+  Grid,
+  Button,
+  makeStyles,
+  Card,
+  Typography,
+  TextField,
+  CircularProgress,
+  CardContent
+} from '@material-ui/core';
+const useStyles = makeStyles({
+  root: {
+    height: '100vh',
+    backgroundImage: 'url(Fondo.jpg)',
+    backgroundSize: 'cover'
+  },
+  loginBackground: {
+    backgroundColor: '#F2F2F2D0',
+    borderRadius: '1rem',
+    paddingTop: '3rem',
+    paddingBottom: '3rem',
+    paddingLeft: '1rem',
+    paddingRight: '1rem'
+  },
+  logo: {
+    maxWidth: '22.5rem'
+  }
+});
 function Landing() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const { login } = useAuth();
-
+  const classes = useStyles();
   function handleOnSubmit(e) {
-    e.preventDefault();
     setLoading(true);
     setError(false);
     login(email, password)
@@ -36,84 +47,90 @@ function Landing() {
   }
 
   return (
-    <Main background="url('Fondo.jpg')" justify='center'>
-      <Box align='start' margin={{ left: '17%' }}>
-        <Card
-          background={{ opacity: 'strong', color: 'light-1' }}
-          height='auto'
-          pad='medium'
-          width='auto'>
-          <Box>
-            <Box margin='auto' width='auto' justify='center' pad='medium'>
-              <Box pad='medium' align='center'>
-                <Heading margin='none' level='2'>
+    <Grid
+      container
+      direction='row'
+      justify='space-evenly'
+      alignItems='center'
+      className={classes.root}>
+      <Grid item>
+        <Card className={classes.loginBackground}>
+          <CardContent>
+            <Grid container direction='column' spacing={3}>
+              <Grid item>
+                <Typography align='center' variant='h4'>
                   Reserva de Salas
-                </Heading>
-                <Heading margin='none' level='3'>
+                </Typography>
+                <Typography align='center' variant='h5'>
                   Organiza tu tiempo
-                </Heading>
-              </Box>
-            </Box>
-
-            <Box width='auto'>
+                </Typography>
+              </Grid>
               {loading ? (
-                <Box align='center'>
-                  <Spinner margin='medium' size='large' />
-                </Box>
+                <Grid container='row' justify='center'>
+                  <Grid item>
+                    <CircularProgress />
+                  </Grid>
+                </Grid>
               ) : (
-                <>
-                  <CardHeader justify='center'>
-                    <Heading level='3'>Iniciar sesión</Heading>
-                  </CardHeader>
-                  <Form onSubmit={handleOnSubmit}>
-                    <CardBody pad='medium'>
+                <Grid item>
+                  <form onSubmit={handleOnSubmit}>
+                    <Grid
+                      container
+                      direction='column'
+                      spacing={2}
+                      alignItems='center'>
+                      <Grid item>
+                        <Typography variant='h5' style={{ color: '#002e5e' }}>
+                          Iniciar sesión
+                        </Typography>
+                      </Grid>
                       {error && (
-                        <Text margin='small' color='status-critical'>
-                          Error iniciando sesión. Por favor revise sus
-                          credenciales.
-                        </Text>
+                        <Grid item>
+                          <Typography color='error'>
+                            Error iniciando sesión. <br />
+                            Por favor revise sus credenciales.
+                          </Typography>
+                        </Grid>
                       )}
-                      <FormField
-                        name='email'
-                        htmlFor='text-input-email'
-                        label='Email'
-                        required>
-                        <TextInput
+                      <Grid item>
+                        <TextField
                           id='text-input-email'
-                          name='email'
-                          type='email'
+                          label='Email'
+                          value={email}
                           onChange={(e) => setEmail(e.target.value)}
+                          required
+                          type='email'
+                          variant='outlined'
                         />
-                      </FormField>
-                      <FormField
-                        name='password'
-                        htmlFor='text-input-password'
-                        label='Contraseña'
-                        required>
-                        <TextInput
+                      </Grid>
+                      <Grid item>
+                        <TextField
                           id='text-input-password'
-                          name='password'
-                          type='password'
+                          label='Contraseña'
                           onChange={(e) => setPassword(e.target.value)}
+                          required
+                          type='password'
+                          variant='outlined'
                         />
-                      </FormField>
-                    </CardBody>
-                    <CardFooter pad='small' justify='center'>
-                      <Button
-                        type='submit'
-                        primary
-                        label='Ingresar'
-                        color='brand'
-                      />
-                    </CardFooter>
-                  </Form>
-                </>
+                      </Grid>
+                      <Grid item>
+                        <Button
+                          color='primary'
+                          type='submit'
+                          variant='contained'>
+                          Ingresar
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  </form>
+                </Grid>
               )}
-            </Box>
-          </Box>
+            </Grid>
+          </CardContent>
         </Card>
-      </Box>
-    </Main>
+      </Grid>
+      <Grid item></Grid>
+    </Grid>
   );
 }
 

@@ -1,29 +1,43 @@
 import React from 'react';
-import { Button, Header } from 'grommet';
-import { Home } from 'grommet-icons';
-import { Link } from 'react-router-dom';
 import useAuth from '../providers/Auth';
 import { useHistory } from 'react-router-dom';
+import {
+  AppBar,
+  Button,
+  IconButton,
+  makeStyles,
+  Toolbar
+} from '@material-ui/core';
+import HomeIcon from '@material-ui/icons/Home';
 
-function BarraSuperior(props) {
+const useStyles = makeStyles((theme) => ({
+  appBar: {
+    zIndex: theme.zIndex.drawer + 1
+  }
+}));
+
+function BarraSuperior() {
   const { logout } = useAuth();
   let history = useHistory();
+  const classes = useStyles();
+
   return (
-    <Header background='#02475e' height='100%'>
-      <Button icon={<Home />} />
-      <Button
-        primary
-        label='Cerrar sesión'
-        color={'#f4971a'}
-        component={Link}
-        to='/'
-        onClick={(e) => {
-          e.preventDefault();
-          logout();
-          history.push('/');
-        }}
-      />
-    </Header>
+    <AppBar className={classes.appBar} position='static'>
+      <Toolbar>
+        <IconButton color='inherit' onClick={() => history.push('/')}>
+          <HomeIcon />
+        </IconButton>
+        <div style={{ flexGrow: 1 }} />
+        <Button
+          color='inherit'
+          onClick={() => {
+            logout();
+            history.push('/');
+          }}>
+          Cerrar sesión
+        </Button>
+      </Toolbar>
+    </AppBar>
   );
 }
 export default BarraSuperior;

@@ -1,21 +1,21 @@
 import {
-  Box,
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  DateInput,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  Grid,
+  InputLabel,
+  TextField,
   Select,
-  Text,
-  TextArea,
-  TextInput
-} from 'grommet';
+  MenuItem,
+  Button
+} from '@material-ui/core';
 import React, { useState } from 'react';
 import { db } from '../firebase';
 import useAuth from '../providers/Auth';
 
-function EventView({ close, event, roomId, selection }) {
+function EventView({ close, show, event, roomId, selection }) {
   const { user } = useAuth();
   const [title, setTitle] = useState(event ? event.title : '');
   const [details, setDetails] = useState(event ? event.details : '');
@@ -78,96 +78,129 @@ function EventView({ close, event, roomId, selection }) {
     close();
   }
 
+  const options = [
+    '9:40',
+    '10:50',
+    '12:00',
+    '13:10',
+    '14:20',
+    '15:30',
+    '16:40',
+    '17:50',
+    '19:00',
+    '20:00'
+  ];
   return (
-    <Card>
-      <CardHeader direction='column' pad='medium'>
-        <TextInput value={event ? event.username : user.displayName} disabled />
-        <TextInput
-          value={title}
-          placeholder='Nombre reserva'
-          onChange={(e) => {
-            setTitle(e.target.value);
-          }}
-        />
-        <TextArea
-          resize={false}
-          placeholder='Detalles adicionales'
-          value={details}
-          onChange={(e) => {
-            setDetails(e.target.value);
-          }}
-        />
-      </CardHeader>
-      <CardBody pad='medium'>
-        <Text>Fecha</Text>
-        <DateInput
-          format='dd/mm/yy'
-          value={date}
-          onChange={({ value }) => setDate(value)}
-        />
-
-        <Box direction='row-responsive' margin={{ top: 'small' }}>
-          <Box margin={{ right: 'small' }}>
-            <Text>Desde</Text>
-            <Select
-              defaultValue={startHour}
-              options={[
-                '8:30',
-                '9:40',
-                '10:50',
-                '12:00',
-                '13:10',
-                '14:20',
-                '15:30',
-                '16:40',
-                '17:50',
-                '19:00'
-              ]}
-              onChange={({ option }) => setStartHour(option)}
+    <Dialog open={show} onClose={close} fullWidth>
+      <DialogTitle>Evento</DialogTitle>
+      <DialogContent>
+        <Grid container direction='column' spacing={2}>
+          <Grid item>
+            <TextField
+              label='Reservado por'
+              fullWidth
+              value={event ? event.username : user.displayName}
+              disabled
             />
-          </Box>
-          <Box margin={{ left: 'small' }}>
-            <Text>Hasta</Text>
-            <Select
-              defaultValue={endHour}
-              options={[
-                '9:40',
-                '10:50',
-                '12:00',
-                '13:10',
-                '14:20',
-                '15:30',
-                '16:40',
-                '17:50',
-                '19:00',
-                '20:00'
-              ]}
-              onChange={({ option }) => setEndHour(option)}
+          </Grid>
+          <Grid item>
+            <TextField
+              label='Nombre reserva'
+              fullWidth
+              value={title}
+              onChange={(e) => {
+                setTitle(e.target.value);
+              }}
             />
-          </Box>
-        </Box>
-      </CardBody>
-      <CardFooter justify='center' pad='medium'>
+          </Grid>
+          <Grid item>
+            <TextField
+              fullWidth
+              multiline
+              rowsMax={4}
+              label='Detalles adicionales'
+              value={details}
+              onChange={(e) => {
+                setDetails(e.target.value);
+              }}
+            />
+          </Grid>
+          <Grid item>
+            <TextField
+              fullWidth
+              id='date'
+              label='Fecha'
+              format='dd/mm/yy'
+              type='date'
+              value={date}
+              onChange={({ value }) => {
+                setDate(value);
+              }}
+              InputLabelProps={{
+                shrink: true
+              }}
+            />
+          </Grid>
+          <Grid item>
+            <Grid container direction='row' spacing={1}>
+              <Grid item>
+                <FormControl style={{ minWidth: '14rem' }} fullWidth>
+                  <InputLabel id='start-date-select-label'>Desde</InputLabel>
+                  <Select
+                    fullWidth
+                    labelId='start-date-select-label'
+                    value={startHour}
+                    onChange={(e) => {
+                      setStartHour(e.target.value);
+                    }}>
+                    {options.map((option) => (
+                      <MenuItem value={option}>{option}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <div style={{ flexGrow: 1 }} />
+              <Grid item>
+                <FormControl style={{ minWidth: '14rem' }} fullWidth>
+                  <InputLabel id='end-date-select-label'>Hasta</InputLabel>
+                  <Select
+                    fullWidth
+                    labelId='end-date-select-label'
+                    value={endHour}
+                    onChange={(e) => setEndHour(e.target.value)}>
+                    {options.map((option) => (
+                      <MenuItem value={option}>{option}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+      </DialogContent>
+      <DialogActions>
         {event ? (
-          <Box direction='row-responsive' flex='grow' justify='between'>
+          <>
+            <Button color='secondary' onClick={handleDelete}>
+              Eliminar
+            </Button>
             <Button
+              color='primary'
               disabled={title.length === 0}
-              label='Confirmar edición'
-              primary
-              onClick={handleEdit}
-            />
-            <Button label='Eliminar' onClick={handleDelete} />
-          </Box>
+              onClick={handleEdit}>
+              Confirmar edición
+            </Button>
+          </>
         ) : (
           <Button
             disabled={title.length === 0}
-            label='Confirmar reserva'
-            primary
-            onClick={handleBook}
-          />
+            color='primary'
+            onClick={handleBook}>
+            Confirmar reserva
+          </Button>
         )}
-      </CardFooter>
-    </Card>
+      </DialogActions>
+    </Dialog>
   );
 }
 

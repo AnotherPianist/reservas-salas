@@ -110,18 +110,11 @@ function Sala() {
       //update room
       var room = db.collection('rooms').doc(id);
       return (
-        room
-          .update({
-            name: name,
-            description: description,
-            type: type
-          })
-          .then(() => {
-            console.log('Document successfully updated!');
-          })
-          .catch((error) => {
-            console.error('Error updating document: ', error);
-          }),
+        room.update({
+          name: name,
+          description: description,
+          type: type
+        }),
         //delete resources
         resourcesDeleted.forEach((idDelete) =>
           db.collection('resources').doc(idDelete).delete()
@@ -217,7 +210,6 @@ function Sala() {
           onClick={() => {
             agregarFechas({ inicio: inicio, fin: fin });
             setshowFechas(false);
-            console.log(inicio);
           }}
         />
       </Layer>

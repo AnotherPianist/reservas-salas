@@ -3,6 +3,7 @@ import { Link, useHistory } from 'react-router-dom';
 import { db } from '../firebase';
 import {
   Grid,
+  Container,
   IconButton,
   TextField,
   Accordion,
@@ -20,8 +21,6 @@ import {
   TableBody,
   Tooltip,
   Button
-
-  //Select
 } from '@material-ui/core';
 import {
   CalendarToday,
@@ -65,7 +64,6 @@ function AdministrarSalas() {
       const temp = [];
       querySnapshot.forEach((resource) => {
         temp.push(resource.data().label);
-        console.log(resource.data().label);
       });
       setOptions(temp);
     });
@@ -99,38 +97,31 @@ function AdministrarSalas() {
     setSearchOpctions(temp);
     setFlag(true);
   }
+
   function hadlerDelete(element) {
     setSearchOpctions((prev) => prev.filter((el) => el !== element));
   }
   function checkSearch(element) {
-    console.log('searchOptions');
-    console.log(searchOptions);
-    console.log(element);
-
     for (let index = 0; index < searchOptions.length; index++) {
       const searchOption = searchOptions[index];
       if (
         element.name === searchOption.resource &&
         parseInt(element.quantity) >= parseInt(searchOption.minAmount)
       ) {
-        console.log('true');
         return true;
       }
     }
-
     return false;
   }
 
   function searchSala() {
     const searchOptionsAux = [];
-    console.log(searchOptions);
     for (let index = 0; index < searchOptions.length; index++) {
       const element = searchOptions[index];
       if (element.resource !== '' && element.minAmount !== '0') {
         searchOptionsAux.push(element);
       }
     }
-    console.log('---------------------------------');
     setSearchOpctions(searchOptionsAux);
 
     if (searchOptionsAux.length > 0) {
@@ -149,16 +140,10 @@ function AdministrarSalas() {
       salas.forEach((sala) => {
         contAux = 0;
         temp.forEach((idSala) => {
-          if (sala.id === idSala) {
-            contAux++;
-          }
+          if (sala.id === idSala) contAux++;
         });
-        console.log('xd=> ' + contAux + ' ' + count);
-        if (contAux === parseInt(count)) {
-          aux.push(sala);
-        }
+        if (contAux === parseInt(count)) aux.push(sala);
       });
-      console.log(aux);
 
       setSalasSearch(
         aux.filter((x) => x.name.toLowerCase().includes(search.toLowerCase()))
@@ -174,179 +159,180 @@ function AdministrarSalas() {
   }
 
   return (
-    <Grid container spacing={3} direction='column'>
-      <Grid item xs={12}>
-        <Typography variant='h2'>Administrar salas</Typography>
-      </Grid>
-      <Grid container>
-        <Grid item xs>
-          <TextField
-            fullWidth
-            id='search'
-            label='Buscar'
-            onChange={(e) => setSearch(e.target.value)}
-          />
+    <Container>
+      <Grid container spacing={3} direction='column'>
+        <Grid item xs={12}>
+          <Typography variant='h2'>Administrar salas</Typography>
         </Grid>
-        <Grid item xs>
-          <IconButton aria-label='search' onClick={() => searchSala()}>
-            <Search />
-          </IconButton>
+        <Grid container>
+          <Grid item xs>
+            <TextField
+              fullWidth
+              id='search'
+              label='Buscar'
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs>
+            <IconButton aria-label='search' onClick={() => searchSala()}>
+              <Search />
+            </IconButton>
+          </Grid>
         </Grid>
-      </Grid>
-      <Grid container style={{ width: '100%' }}>
-        <Accordion>
-          <AccordionSummary
-            expandIcon={<ExpandMore />}
-            aria-controls='panel1a-content'
-            id='panel1a-header'>
-            <Typography>Busqueda Avanzada</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Grid
-              container
-              spacing={3}
-              direction='column'
-              width='medium'
-              justify='center'
-              alignContent='center'>
-              {searchOptions.map((searchOption, i) => (
-                <Grid item>
-                  <Grid container>
-                    <Grid item xs>
-                      <FormControl fullWidth>
-                        <InputLabel id='select-resource-label'>
-                          Recurso
-                        </InputLabel>
-                        <Select
-                          labelId='select-resource-label'
-                          id='select-resource'
-                          value={searchOption.resource}
-                          onChange={(e) => (
-                            editSearch(i, 'resource', e.target.value),
-                            console.log(e.target.value)
-                          )}>
-                          {options.map((option) => (
-                            <MenuItem value={option}>{option}</MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs>
-                      <TextField
-                        id='coun-resource'
-                        label='cant. Min'
-                        type='number'
-                        onChange={(e) => (
-                          editSearch(i, 'minAmount', e.target.value),
-                          console.log(e.target.value)
-                        )}
-                      />
-                    </Grid>
-                    <Grid item xs>
-                      <IconButton onClick={() => hadlerDelete(searchOption)}>
-                        <Delete />
-                      </IconButton>
+        <Grid container style={{ width: '100%' }}>
+          <Accordion>
+            <AccordionSummary
+              expandIcon={<ExpandMore />}
+              aria-controls='panel1a-content'
+              id='panel1a-header'>
+              <Typography>Busqueda Avanzada</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Grid
+                container
+                spacing={3}
+                direction='column'
+                width='medium'
+                justify='center'
+                alignContent='center'>
+                {searchOptions.map((searchOption, i) => (
+                  <Grid item>
+                    <Grid container>
+                      <Grid item xs>
+                        <FormControl fullWidth>
+                          <InputLabel id='select-resource-label'>
+                            Recurso
+                          </InputLabel>
+                          <Select
+                            labelId='select-resource-label'
+                            id='select-resource'
+                            value={searchOption.resource}
+                            onChange={(e) =>
+                              editSearch(i, 'resource', e.target.value)
+                            }>
+                            {options.map((option) => (
+                              <MenuItem value={option}>{option}</MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                      <Grid item xs>
+                        <TextField
+                          id='coun-resource'
+                          label='cant. Min'
+                          type='number'
+                          onChange={(e) =>
+                            editSearch(i, 'minAmount', e.target.value)
+                          }
+                        />
+                      </Grid>
+                      <Grid item xs>
+                        <IconButton onClick={() => hadlerDelete(searchOption)}>
+                          <Delete />
+                        </IconButton>
+                      </Grid>
                     </Grid>
                   </Grid>
-                </Grid>
-              ))}
+                ))}
 
-              <Button
-                onClick={() =>
-                  setSearchOpctions((prev) =>
-                    prev.concat({ resource: '', minAmount: '0' })
-                  )
-                }
-                startIcon={<Add />}></Button>
-            </Grid>
-          </AccordionDetails>
-        </Accordion>
-      </Grid>
+                <Button
+                  onClick={() =>
+                    setSearchOpctions((prev) =>
+                      prev.concat({ resource: '', minAmount: '0' })
+                    )
+                  }
+                  startIcon={<Add />}></Button>
+              </Grid>
+            </AccordionDetails>
+          </Accordion>
+        </Grid>
 
-      <Typography variant='h2'>Lista de salas</Typography>
+        <Typography variant='h2'>Lista de salas</Typography>
 
-      <Grid>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell scope='col' border='bottom'>
-                Nombre
-              </TableCell>
-              <TableCell scope='col' border='bottom'>
-                Descripción
-              </TableCell>
-              <TableCell scope='col' border='bottom'></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {salasSearch.map((sala) => (
+        <Grid>
+          <Table>
+            <TableHead>
               <TableRow>
-                <TableCell scope='col'>
-                  <Tooltip
-                    style={{ backgroundColor: 'white' }}
-                    placement='right'
-                    title={
-                      <Grid>
-                        <Table>
-                          <TableHead>
-                            <TableRow>
-                              <TableCell scope='col' border='bottom'>
-                                Recurso
-                              </TableCell>
-                              <TableCell scope='col' border='bottom'>
-                                Cantidad
-                              </TableCell>
-                            </TableRow>
-                          </TableHead>
-                        </Table>
-                        <TableBody>
-                          {resource.map((rec) =>
-                            rec.idRoom === sala.id ? (
-                              <TableRow key={rec.i}>
-                                <TableCell scope='col'>
-                                  <Typography>{rec.name}</Typography>
+                <TableCell scope='col' border='bottom'>
+                  Nombre
+                </TableCell>
+                <TableCell scope='col' border='bottom'>
+                  Descripción
+                </TableCell>
+                <TableCell scope='col' border='bottom'></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {salasSearch.map((sala) => (
+                <TableRow>
+                  <TableCell scope='col'>
+                    <Tooltip
+                      color='rgba(0, 0, 0, 0.87)'
+                      placement='right'
+                      title={
+                        <Grid style={{ backgroundColor: 'white' }}>
+                          <Table>
+                            <TableHead>
+                              <TableRow>
+                                <TableCell scope='col' border='bottom'>
+                                  Recurso
                                 </TableCell>
-                                <TableCell scope='col'>
-                                  <Typography>
-                                    <Typography>{rec.quantity}</Typography>
-                                  </Typography>
+                                <TableCell scope='col' border='bottom'>
+                                  Cantidad
                                 </TableCell>
                               </TableRow>
-                            ) : null
-                          )}
-                        </TableBody>
-                      </Grid>
-                    }>
-                    <Typography>{sala.name}</Typography>
-                  </Tooltip>
-                </TableCell>
-                <TableCell scope='col'>
-                  <Typography>
-                    <Typography>{sala.description}</Typography>
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <IconButton
-                    onClick={() => history.push(`/calendar/${sala.id}`)}>
-                    <CalendarToday />
-                  </IconButton>
-                  <IconButton onClick={() => history.push(`/room/${sala.id}`)}>
-                    <Edit />
-                  </IconButton>
-                  <IconButton onClick={() => eliminarSala(sala)}>
-                    <Delete />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Grid>
+                            </TableHead>
+                          </Table>
+                          <TableBody>
+                            {resource.map((rec) =>
+                              rec.idRoom === sala.id ? (
+                                <TableRow key={rec.i}>
+                                  <TableCell scope='col'>
+                                    <Typography>{rec.name}</Typography>
+                                  </TableCell>
+                                  <TableCell scope='col'>
+                                    <Typography>
+                                      <Typography>{rec.quantity}</Typography>
+                                    </Typography>
+                                  </TableCell>
+                                </TableRow>
+                              ) : null
+                            )}
+                          </TableBody>
+                        </Grid>
+                      }>
+                      <Typography>{sala.name}</Typography>
+                    </Tooltip>
+                  </TableCell>
+                  <TableCell scope='col'>
+                    <Typography>
+                      <Typography>{sala.description}</Typography>
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <IconButton
+                      onClick={() => history.push(`/calendar/${sala.id}`)}>
+                      <CalendarToday />
+                    </IconButton>
+                    <IconButton
+                      onClick={() => history.push(`/room/${sala.id}`)}>
+                      <Edit />
+                    </IconButton>
+                    <IconButton onClick={() => eliminarSala(sala)}>
+                      <Delete />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Grid>
 
-      <Link to='/room'>
-        <Button startIcon={<Add />} />
-      </Link>
-    </Grid>
+        <Link to='/room'>
+          <Button startIcon={<Add />} />
+        </Link>
+      </Grid>
+    </Container>
   );
 }
 
