@@ -15,6 +15,11 @@ import React, { useState } from 'react';
 import { db } from '../firebase';
 import useAuth from '../providers/Auth';
 
+/**
+ *
+ * @param {*} param0
+ * @returns
+ */
 function EventView({ close, show, event, roomId, selection }) {
   const { user } = useAuth();
   const [title, setTitle] = useState(event ? event.title : '');
@@ -33,6 +38,9 @@ function EventView({ close, show, event, roomId, selection }) {
       : `${selection.end.getHours()}:${selection.end.getMinutes() || '00'}`
   );
 
+  /**
+   *
+   */
   function handleBook() {
     const startDate = new Date(date);
     startDate.setHours(...startHour.split(':'), 0);
@@ -49,6 +57,9 @@ function EventView({ close, show, event, roomId, selection }) {
     close();
   }
 
+  /**
+   *
+   */
   function handleEdit() {
     const startDate = new Date(date);
     startDate.setHours(...startHour.split(':'), 0);
@@ -69,6 +80,9 @@ function EventView({ close, show, event, roomId, selection }) {
     close();
   }
 
+  /**
+   *
+   */
   function handleDelete() {
     db.collection('rooms')
       .doc(roomId)
@@ -78,6 +92,9 @@ function EventView({ close, show, event, roomId, selection }) {
     close();
   }
 
+  /**
+   *
+   */
   const options = [
     '9:40',
     '10:50',
@@ -90,6 +107,7 @@ function EventView({ close, show, event, roomId, selection }) {
     '19:00',
     '20:00'
   ];
+
   return (
     <Dialog open={show} onClose={close} fullWidth>
       <DialogTitle>Evento</DialogTitle>

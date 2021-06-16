@@ -10,6 +10,10 @@ import {
   CircularProgress,
   CardContent
 } from '@material-ui/core';
+
+/**
+ *
+ */
 const useStyles = makeStyles({
   root: {
     height: '100vh',
@@ -28,6 +32,11 @@ const useStyles = makeStyles({
     maxWidth: '22.5rem'
   }
 });
+
+/**
+ *
+ * @returns
+ */
 function Landing() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

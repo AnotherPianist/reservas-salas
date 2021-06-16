@@ -13,6 +13,9 @@ import {
 import ListIcon from '@material-ui/icons/List';
 import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';
 
+/**
+ *
+ */
 const useStyles = makeStyles((theme) => ({
   paper: {
     background: theme.palette.primary.main
@@ -26,6 +29,9 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+/**
+ *
+ */
 const items = [
   {
     icon: <ListIcon />,
@@ -39,6 +45,10 @@ const items = [
   }
 ];
 
+/**
+ *
+ * @returns
+ */
 function BarraLateral() {
   const classes = useStyles();
   const history = useHistory();

@@ -10,12 +10,19 @@ import {
 } from '@material-ui/core';
 import HomeIcon from '@material-ui/icons/Home';
 
+/**
+ *
+ */
 const useStyles = makeStyles((theme) => ({
   appBar: {
     zIndex: theme.zIndex.drawer + 1
   }
 }));
 
+/**
+ *
+ * @returns
+ */
 function BarraSuperior() {
   const { logout } = useAuth();
   let history = useHistory();

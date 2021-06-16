@@ -10,21 +10,23 @@ function PrincipalAdmin() {
   return (
     <div style={{ display: 'flex' }}>
       <BarraLateral />
-      <Switch>
-        <Route exact path='/'>
-          <AdministrarSalas />
-        </Route>
-        <Route exact path='/room'>
-          <Sala />
-        </Route>
-        <Route path='/room/:id'>
-          <Sala />
-        </Route>
-        <Route path='/calendar/:roomId'>
-          <CalendarView />
-        </Route>
-        <Route exact path='/'></Route>
-      </Switch>
+      <Container>
+        <Switch>
+          <Route exact path='/'>
+            <AdministrarSalas />
+          </Route>
+          <Route exact path='/room'>
+            <Sala />
+          </Route>
+          <Route path='/room/:id'>
+            <Sala />
+          </Route>
+          <Route path='/calendar/:roomId'>
+            <CalendarView />
+          </Route>
+          <Route exact path='/'></Route>
+        </Switch>
+      </Container>
     </div>
   );
 }

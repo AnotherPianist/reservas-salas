@@ -1,5 +1,6 @@
 import './App.css';
 import PrincipalAdmin from './vistas/PrincipalAdmin';
+import PrincipalEstudiante from './vistas/PrincipalEstudiante';
 import Landing from './landing/Landing.js';
 import { useAuth } from './providers/Auth';
 import { CssBaseline, ThemeProvider } from '@material-ui/core';
@@ -13,7 +14,7 @@ function App() {
       {user ? (
         <>
           <BarraSuperior />
-          {user.admin ? <PrincipalAdmin /> : <h1>No disponible</h1>}
+          {user.admin ? <PrincipalAdmin /> : <PrincipalEstudiante />}
         </>
       ) : (
         <Landing />

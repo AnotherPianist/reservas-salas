@@ -10,14 +10,23 @@ import { Container, Grid, Typography } from '@material-ui/core';
 
 moment.locale('es');
 
-function CalendarView() {
+/**
+ *
+ * @param {*} param0
+ * @returns
+ */
+function CalendarView({ roomProp }) {
   const { roomId } = useParams();
+  const [room, setRoom] = useState(roomProp ? roomProp : roomId);
   const [showCreateEventDialog, setShowCreateEventDialog] = useState(false);
   const [showEventDialogDetails, setShowEventDialogDetails] = useState(false);
   const [events, setEvents] = useState([]);
   const [selection, setSelection] = useState();
   const [eventSelected, setEventSelected] = useState();
 
+  /**
+   *
+   */
   const messages = {
     allDay: 'Todo el día',
     previous: '<',
@@ -36,10 +45,13 @@ function CalendarView() {
 
   const localizer = momentLocalizer(moment);
 
+  /**
+   *
+   */
   useEffect(() => {
     const unsubscribe = db
       .collection('rooms')
-      .doc(roomId)
+      .doc(room)
       .collection('bookings')
       .onSnapshot((querySnapshot) => {
         const temp = [];
@@ -55,7 +67,7 @@ function CalendarView() {
         setEvents(temp);
       });
     return unsubscribe;
-  }, [roomId]);
+  }, [room]);
 
   return (
     <Container>
@@ -87,7 +99,7 @@ function CalendarView() {
           <EventView
             show={showCreateEventDialog}
             close={() => setShowCreateEventDialog(false)}
-            roomId={roomId}
+            roomId={room}
             selection={selection}
           />
         )}
@@ -95,7 +107,7 @@ function CalendarView() {
           <EventView
             show={showEventDialogDetails}
             close={() => setShowEventDialogDetails(false)}
-            roomId={roomId}
+            roomId={room}
             event={eventSelected}
           />
         )}
@@ -104,12 +116,17 @@ function CalendarView() {
   );
 }
 
+/**
+ *
+ * @param {*} param0
+ * @returns
+ */
 function CalendarEvent({ event }) {
   return (
-    <Grid>
+    <>
       <Typography>{event.title}</Typography>
       <Typography>{event.username}</Typography>
-    </Grid>
+    </>
   );
 }
 

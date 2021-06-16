@@ -22,19 +22,26 @@ import {
 } from '@material-ui/core';
 import { Delete, Save, Add } from '@material-ui/icons';
 
+/**
+ *
+ * @returns
+ */
 function Sala() {
   const { id } = useParams();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [type, setType] = useState('');
   const [recursos, setRecursos] = useState([]);
-  const [fechasBloquedas, setFechasBlock] = useState([]);
-  const [showFechas, setshowFechas] = useState();
+
   const [showRecurso, setshowRecurso] = useState();
   const [resourcesDeleted, setResourcesDeleted] = useState([]);
   const [resourcesAdded, setResourcesAdded] = useState([]);
   const [flag, setFlag] = useState(false);
 
+  /**
+   * UseEffect ejecutado en caso de que exista el id de la sala que se quiere mostrar, principalmente
+   * se encarga de obtener los datos de la sala y los datos de los recursos de esta según el id dado.
+   */
   useEffect(() => {
     if (id) {
       db.collection('resources')
@@ -56,15 +63,25 @@ function Sala() {
           setDescription(data.description);
           setType(data.type);
         });
-
       setFlag(true);
     }
   }, []);
 
+  /**
+   *  UseEffect que detecta cuando cambia la variable flag, en caso de que cambie, se renderiza
+   * la información de la sala.
+   */
   useEffect(() => {
     setFlag(false);
   }, [flag]);
 
+  /**
+   * Función que recibe un recurso perteneciente a la sala para eliminar.
+   * @param {*} rec, recurso a eliminar
+   * Se actualiza la lista que contiene los recursos utilizando un filtro, excluyendo al recurso dado
+   * como parámetro, en caso de que el id esté definido, se agrega el id del recurso eliminado a la
+   * lista que contiene dichos recursos, para eliminarlos posteriormente de la base de datos.
+   */
   function eliminarElemento(rec) {
     setRecursos((prevRecursos) => prevRecursos.filter((el) => el !== rec));
     if (id) {
@@ -74,10 +91,12 @@ function Sala() {
     }
   }
 
-  function eliminarFecha(rec) {
-    setFechasBlock((prevRecursos) => prevRecursos.filter((el) => el !== rec));
-  }
-
+  /**
+   *Función que agrega un recurso a la lista de recursos agregados por el usuario.
+   * @param {*} recurso, recurso a agregar a la lista de recursos.
+   * En caso que el id esté definido, se agrega el recurso a la lista de recursos agregados,
+   * que posteriormente se guardarán en la base de datos.
+   */
   function agregarRecurso(recurso) {
     setRecursos((prevRecursos) => prevRecursos.concat(recurso));
     if (id) {
@@ -85,10 +104,17 @@ function Sala() {
     }
   }
 
-  function agregarFechas(fechas) {
-    setFechasBlock((prevRecursos) => prevRecursos.concat(fechas));
-  }
-
+  /**
+   * Función encargada de guardar y actualizar los cambios realizados en la sala.
+   * -En caso de que la sala no tenga un id creado, entonces se agregan los elementos entregados
+   * por el usuario a un nuevo documento en las salas y un nuevo documento en los recursos definidos
+   * en la base de datos.
+   * -En caso de que la sala ya tenga un id creado, se actualizan los datos según los datos agregados por el
+   * usuario y en el caso de los recursos se actualizan las listas de elementos agregados o
+   * eliminados de la sala (resourcesDeleted, resoursesAdded).
+   * @returns, se retornan los recursos actualizados en la base de datos.
+   *
+   */
   function guardarHandler() {
     if (!id) {
       db.collection('rooms')
@@ -133,6 +159,15 @@ function Sala() {
 
   let history = useHistory();
 
+  /**
+   * @param {*} props, no se utilizan props.
+   * @returns, retorna o renderiza el Modal para agregar los recursos a la sala.
+   * Para controlar la aparición del componente se hace a través de la variable showRecurso,
+   * dentro de componente modal se hace un llamado al componente ResourseSelect, utilizado para seleccionar
+   * un recurso ya creado o para agregar uno nuevo, además se muestra el componente TextField para ingresar la
+   * cantidad del recurso seleccionado, además se muestra un último componente con el ícono de un disquete
+   * para guardar los cambios realizados.
+   */
   function Recurso(props) {
     const [quantity, setQuantity] = useState('');
     const [type, setType] = useState('');
@@ -147,7 +182,7 @@ function Sala() {
           justifyContent: 'center'
         }}>
         <Box bgcolor='white' padding={8}>
-          <Typography variant='h5'>Resurso</Typography>
+          <Typography variant='h5'>Recurso</Typography>
 
           <ResourceSelect
             id='company-name'
@@ -178,45 +213,11 @@ function Sala() {
       </Modal>
     );
   }
-  {
-    /*
-  function Fechas(props) {
-    const [inicio, setInicio] = useState(props.inicio);
-    const [fin, setFin] = useState(props.fin);
-    return (
-      <Layer
-        onEsc={() => setshowFechas(false)}
-        onClickOutside={() => setshowFechas(false)}>
-        <Typography variant='h5'>Fechas</Typography>
 
-        <Typography variant='h6'>Fecha de inicio</Typography>
-        <DateInput
-          format='dd/mm/yyyy'
-          value={inicio}
-          onChange={({ value }) => {
-            setInicio(value);
-          }}
-        />
-        <Typography variant='h6'>Fecha de Fin</Typography>
-        <DateInput
-          format='dd/mm/yyyy'
-          value={fin}
-          onChange={({ value }) => {
-            setFin(value);
-          }}
-        />
-        <Button
-          label='Guardar'
-          onClick={() => {
-            agregarFechas({ inicio: inicio, fin: fin });
-            setshowFechas(false);
-          }}
-        />
-      </Layer>
-    );
-  }*/
-  }
-
+  /*
+   * Retorno del componente Sala.js, que se encarga de renderizar la sección de edición y agregación
+   * de una sala.
+   */
   return (
     <>
       {showRecurso && <Recurso />}

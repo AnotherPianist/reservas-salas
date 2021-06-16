@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { db } from '../firebase';
 import {
   Grid,
@@ -19,34 +19,22 @@ import {
   TableCell,
   TableBody,
   Tooltip,
-  Button
+  Button,
+  Container
 } from '@material-ui/core';
-import {
-  CalendarToday,
-  Delete,
-  ExpandMore,
-  Add,
-  Edit
-} from '@material-ui/icons';
+import { CalendarToday, Delete, ExpandMore, Add } from '@material-ui/icons';
 import React from 'react';
+import CalendarView from '../calendar/CalendarView';
 
-/**
- *
- * @returns
- */
-function AdministrarSalas() {
-  let history = useHistory();
+function PrincipalEstudiante() {
   const [search, setSearch] = useState('');
   const [salas, setSalas] = useState([]);
   const [options, setOptions] = useState([]);
   const [flag, setFlag] = useState([]);
   const [resource, setResources] = useState([]);
   const [searchOptions, setSearchOptions] = useState([]);
-  const [salasSearch, setSalasSearch] = useState(salas);
+  const [salaId, setSalaId] = useState();
 
-  /**
-   *
-   */
   useEffect(() => {
     db.collection('rooms').onSnapshot((querySnapshot) => {
       const temp = [];
@@ -65,9 +53,6 @@ function AdministrarSalas() {
     });
   }, []);
 
-  /**
-   *
-   */
   useEffect(() => {
     db.collection('resourcesSelect').onSnapshot((querySnapshot) => {
       const temp = [];
@@ -78,40 +63,12 @@ function AdministrarSalas() {
     });
   }, []);
 
-  /**
-   *
-   */
   useEffect(() => {
     setFlag(false);
   }, [flag]);
 
-  /**
-   *
-   * @param {*} sala
-   */
-  function eliminarSala(sala) {
-    setSalas((prevRecursos) => prevRecursos.filter((el) => el !== sala));
-    setSalasSearch((prevRecursos) => prevRecursos.filter((el) => el !== sala));
-    const salaId = sala.id;
-    db.collection('rooms')
-      .doc(salaId)
-      .delete()
-      .then(() => {
-        db.collection('resources')
-          .where('idRoom', '==', salaId)
-          .get()
-          .then((querySnapshot) => {
-            querySnapshot.forEach((resource) => resource.ref.delete());
-          });
-      });
-  }
+  const [salasSearch, setSalasSearch] = useState(salas);
 
-  /**
-   *
-   * @param {*} index
-   * @param {*} camp
-   * @param {*} newValue
-   */
   function editSearch(index, camp, newValue) {
     const temp = searchOptions;
     temp[index][camp] = newValue;
@@ -123,11 +80,6 @@ function AdministrarSalas() {
     setSearchOptions((prev) => prev.filter((el) => el !== element));
   }
 
-  /**
-   *
-   * @param {*} element
-   * @returns
-   */
   function checkSearch(element) {
     for (let index = 0; index < searchOptions.length; index++) {
       const searchOption = searchOptions[index];
@@ -141,9 +93,6 @@ function AdministrarSalas() {
     return false;
   }
 
-  /**
-   *
-   */
   useEffect(() => {
     const searchOptionsAux = [];
     for (let index = 0; index < searchOptions.length; index++) {
@@ -186,13 +135,13 @@ function AdministrarSalas() {
         aux.filter((x) => x.name.toLowerCase().includes(search.toLowerCase()))
       );
     }
-  }, [search]);
+  }, [salasSearch]);
 
   return (
-    <>
+    <Container style={{ marginTop: '2rem' }}>
       <Grid container spacing={3} direction='column'>
         <Grid item>
-          <Typography variant='h2'>Administrar salas</Typography>
+          <Typography variant='h3'>Selecciona una sala</Typography>
         </Grid>
         <Grid item>
           <TextField
@@ -333,16 +282,8 @@ function AdministrarSalas() {
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    <IconButton
-                      onClick={() => history.push(`/calendar/${sala.id}`)}>
+                    <IconButton onClick={() => setSalaId(sala.id)}>
                       <CalendarToday />
-                    </IconButton>
-                    <IconButton
-                      onClick={() => history.push(`/room/${sala.id}`)}>
-                      <Edit />
-                    </IconButton>
-                    <IconButton onClick={() => eliminarSala(sala)}>
-                      <Delete />
                     </IconButton>
                   </TableCell>
                 </TableRow>
@@ -350,13 +291,10 @@ function AdministrarSalas() {
             </TableBody>
           </Table>
         </Grid>
-
-        <Link to='/room'>
-          <Button startIcon={<Add />} />
-        </Link>
       </Grid>
-    </>
+      {salaId && <CalendarView roomProp={salaId} />}
+    </Container>
   );
 }
 
-export default AdministrarSalas;
+export default PrincipalEstudiante;

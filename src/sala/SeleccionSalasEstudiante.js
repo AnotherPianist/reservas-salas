@@ -25,28 +25,21 @@ import {
   CalendarToday,
   Delete,
   ExpandMore,
+  Search,
   Add,
   Edit
 } from '@material-ui/icons';
 import React from 'react';
 
-/**
- *
- * @returns
- */
-function AdministrarSalas() {
+function SeleccionSalaEstudantes() {
   let history = useHistory();
   const [search, setSearch] = useState('');
   const [salas, setSalas] = useState([]);
   const [options, setOptions] = useState([]);
   const [flag, setFlag] = useState([]);
   const [resource, setResources] = useState([]);
-  const [searchOptions, setSearchOptions] = useState([]);
-  const [salasSearch, setSalasSearch] = useState(salas);
+  const [searchOptions, setSearchOpctions] = useState([]);
 
-  /**
-   *
-   */
   useEffect(() => {
     db.collection('rooms').onSnapshot((querySnapshot) => {
       const temp = [];
@@ -64,10 +57,6 @@ function AdministrarSalas() {
       setResources(temp);
     });
   }, []);
-
-  /**
-   *
-   */
   useEffect(() => {
     db.collection('resourcesSelect').onSnapshot((querySnapshot) => {
       const temp = [];
@@ -77,18 +66,12 @@ function AdministrarSalas() {
       setOptions(temp);
     });
   }, []);
-
-  /**
-   *
-   */
   useEffect(() => {
     setFlag(false);
   }, [flag]);
 
-  /**
-   *
-   * @param {*} sala
-   */
+  const [salasSearch, setSalasSearch] = useState(salas);
+
   function eliminarSala(sala) {
     setSalas((prevRecursos) => prevRecursos.filter((el) => el !== sala));
     setSalasSearch((prevRecursos) => prevRecursos.filter((el) => el !== sala));
@@ -106,28 +89,17 @@ function AdministrarSalas() {
       });
   }
 
-  /**
-   *
-   * @param {*} index
-   * @param {*} camp
-   * @param {*} newValue
-   */
   function editSearch(index, camp, newValue) {
     const temp = searchOptions;
     temp[index][camp] = newValue;
-    setSearchOptions(temp);
+    setSearchOpctions(temp);
     setFlag(true);
   }
 
   function hadlerDelete(element) {
-    setSearchOptions((prev) => prev.filter((el) => el !== element));
+    setSearchOpctions((prev) => prev.filter((el) => el !== element));
   }
 
-  /**
-   *
-   * @param {*} element
-   * @returns
-   */
   function checkSearch(element) {
     for (let index = 0; index < searchOptions.length; index++) {
       const searchOption = searchOptions[index];
@@ -141,10 +113,7 @@ function AdministrarSalas() {
     return false;
   }
 
-  /**
-   *
-   */
-  useEffect(() => {
+  function searchSala() {
     const searchOptionsAux = [];
     for (let index = 0; index < searchOptions.length; index++) {
       const element = searchOptions[index];
@@ -152,7 +121,7 @@ function AdministrarSalas() {
         searchOptionsAux.push(element);
       }
     }
-    setSearchOptions(searchOptionsAux);
+    setSearchOpctions(searchOptionsAux);
 
     if (searchOptionsAux.length > 0) {
       var count = searchOptionsAux.length;
@@ -186,21 +155,28 @@ function AdministrarSalas() {
         aux.filter((x) => x.name.toLowerCase().includes(search.toLowerCase()))
       );
     }
-  }, [search]);
+  }
 
   return (
     <>
       <Grid container spacing={3} direction='column'>
-        <Grid item>
+        <Grid item xs={12}>
           <Typography variant='h2'>Administrar salas</Typography>
         </Grid>
-        <Grid item>
-          <TextField
-            fullWidth
-            id='search'
-            label='Buscar'
-            onChange={(e) => setSearch(e.target.value)}
-          />
+        <Grid container>
+          <Grid item xs>
+            <TextField
+              fullWidth
+              id='search'
+              label='Buscar'
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs>
+            <IconButton aria-label='search' onClick={() => searchSala()}>
+              <Search />
+            </IconButton>
+          </Grid>
         </Grid>
         <Grid container style={{ width: '100%' }}>
           <Accordion>
@@ -260,7 +236,7 @@ function AdministrarSalas() {
 
                 <Button
                   onClick={() =>
-                    setSearchOptions((prev) =>
+                    setSearchOpctions((prev) =>
                       prev.concat({ resource: '', minAmount: '0' })
                     )
                   }
@@ -359,4 +335,4 @@ function AdministrarSalas() {
   );
 }
 
-export default AdministrarSalas;
+export default SeleccionSalaEstudantes;
