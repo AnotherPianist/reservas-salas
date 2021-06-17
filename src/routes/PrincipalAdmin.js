@@ -6,6 +6,12 @@ import BarraLateral from '../layout/BarraLateral';
 import CalendarView from '../calendar/CalendarView';
 import { Container } from '@material-ui/core';
 
+/**
+ * Función principal del componente PrincipalAdmin.js
+ * @returns retorna las rutas a las que se le permite ingresar al usuario de tipo Administrador y
+ * sus respectivos componentes a renderizar.
+ */
+
 function PrincipalAdmin() {
   return (
     <div style={{ display: 'flex' }}>
@@ -24,7 +30,6 @@ function PrincipalAdmin() {
           <Route path='/calendar/:roomId'>
             <CalendarView />
           </Route>
-          <Route exact path='/'></Route>
         </Switch>
       </Container>
     </div>

@@ -11,7 +11,7 @@ import {
 import HomeIcon from '@material-ui/icons/Home';
 
 /**
- *
+ * Estilos de la barra superior.
  */
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -20,8 +20,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 /**
- *
- * @returns
+ * Función principal del componente BarraSuperior.js
+ * @returns retorna y renderiza los elementos pertenecientes a la barra superior.
  */
 function BarraSuperior() {
   const { logout } = useAuth();

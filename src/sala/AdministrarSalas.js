@@ -31,24 +31,24 @@ import {
 import React from 'react';
 
 /**
- *
- * @returns
+ * Componente AdministrarSalas.js
+ * @returns retorna y renderiza los componenetes visualizados en la sección de administrar salas por el
+ * administrador, en donde se muestra un buscador, una búsqueda avanzada y la lista de salas creadas.
  */
 function AdministrarSalas() {
-  let history = useHistory();
+  const history = useHistory();
   const [search, setSearch] = useState('');
   const [salas, setSalas] = useState([]);
   const [options, setOptions] = useState([]);
-  const [flag, setFlag] = useState([]);
   const [resource, setResources] = useState([]);
   const [searchOptions, setSearchOptions] = useState([]);
   const [salasSearch, setSalasSearch] = useState(salas);
 
   /**
-   *
+   * useEffect utilizado para obtener los datos de las salas.
    */
   useEffect(() => {
-    db.collection('rooms').onSnapshot((querySnapshot) => {
+    const unsubscribe = db.collection('rooms').onSnapshot((querySnapshot) => {
       const temp = [];
       querySnapshot.forEach((sala) => {
         temp.push({ id: sala.id, ...sala.data() });
@@ -56,38 +56,85 @@ function AdministrarSalas() {
       setSalas(temp);
       setSalasSearch(temp);
     });
-    db.collection('resources').onSnapshot((querySnapshot) => {
-      const temp = [];
-      querySnapshot.forEach((resource) => {
-        temp.push(resource.data());
-      });
-      setResources(temp);
-    });
+    return unsubscribe;
   }, []);
 
   /**
-   *
+   * useEffect utilizado para obtener recursos desde la base de datos
    */
   useEffect(() => {
-    db.collection('resourcesSelect').onSnapshot((querySnapshot) => {
-      const temp = [];
-      querySnapshot.forEach((resource) => {
-        temp.push(resource.data().label);
+    const unsubscribe = db
+      .collection('resources')
+      .onSnapshot((querySnapshot) => {
+        const temp = [];
+        querySnapshot.forEach((resource) => {
+          temp.push(resource.data());
+        });
+        setResources(temp);
       });
-      setOptions(temp);
-    });
+    return unsubscribe;
   }, []);
 
   /**
-   *
+   * useEffect utilizado para obtener los recursos disponibles que han sido registrados en la base de datos.
    */
   useEffect(() => {
-    setFlag(false);
-  }, [flag]);
+    db.collection('resourcesSelect')
+      .get()
+      .then((querySnapshot) => {
+        const temp = [];
+        querySnapshot.forEach((resource) => {
+          temp.push(resource.data().label);
+        });
+        setOptions(temp);
+      });
+  }, []);
 
   /**
-   *
-   * @param {*} sala
+   * UseEffect encargado de ejecutarse cada vez que haya algún cambio en la variable search o searchOptions,
+   * su objetivo es actualizar las salas a mostrar en caso de que cumplan tanto con la búsqueda de
+   * nombre de salas como con la búsqueda avanzada.
+   * Los pasos que realiza son, en primer lugar recorrer la lista de recursos para filtrar en la
+   * búsqueda avanzada, para limpiarla en caso de que no se seleccione recurso y cantidad, luego:
+   * -En caso de que la lista tenga algún elemento, se recorre la lista de recursos general y en
+   * caso de que checkSearch retorne true, se agregará el id de la sala a la que pertenece el
+   * recurso a una lista temporal y posteriormente se agregan las salas a una nueva lista que
+   * coincidan con el id obtenido anteriormente, finalmente se aplica la busqueda por nombre
+   * sobre la lista de salas final.
+   * -En caso de que la lista esté vacía solo se aplica la búsqueda por nombre sobre la lista de salas.
+   */
+  useEffect(() => {
+    if (searchOptions) {
+      const temp = [];
+      resource.forEach((rec) => {
+        if (checkSearch(rec)) temp.push(rec.idRom);
+      });
+
+      const aux = [];
+      salas.forEach((sala) => {
+        let contAux = 0;
+        temp.forEach((idSala) => {
+          if (sala.id === idSala) contAux++;
+        });
+        if (contAux === searchOptions.length) aux.push(sala);
+      });
+
+      setSalasSearch(
+        aux.filter((x) => x.name.toLowerCase().includes(search.toLowerCase()))
+      );
+    } else {
+      setSalasSearch(
+        salas.filter((x) => x.name.toLowerCase().includes(search.toLowerCase()))
+      );
+    }
+  }, [search, searchOptions]);
+
+  /**
+   * Función encargada de eliminar una sala.
+   * @param {*} sala, sala a eliminar de la base de datos.
+   * En las variables que se guardan las salas y las salas a buscar se quita la sala dada como parámetro,
+   * luego se elimina del documento "rooms", la sala según su id, además se eliminan los recursos que
+   * ésta tenga agregados.
    */
   function eliminarSala(sala) {
     setSalas((prevRecursos) => prevRecursos.filter((el) => el !== sala));
@@ -107,92 +154,51 @@ function AdministrarSalas() {
   }
 
   /**
-   *
-   * @param {*} index
-   * @param {*} camp
-   * @param {*} newValue
+   * Función ecargada de editar la lista de recursos que se tiene para filtrar.
+   * @param {*} index, indice del recurso a filtrar.
+   * @param {*} camp, campo a filtrar (resource o minAmount).
+   * @param {*} newValue, nuevo valor en que se agregará (tipo de recurso o cantidad de recurso)
    */
   function editSearch(index, camp, newValue) {
     const temp = searchOptions;
     temp[index][camp] = newValue;
     setSearchOptions(temp);
-    setFlag(true);
   }
 
-  function hadlerDelete(element) {
+  /**
+   * Función utilizada para eliminar un recurso de la lista de recursos para filtrar.
+   * @param {*} element, recurso a eliminar de la lista.
+   */
+  function handleDelete(element) {
     setSearchOptions((prev) => prev.filter((el) => el !== element));
   }
 
   /**
-   *
-   * @param {*} element
-   * @returns
+   * Función encargada de verificar la búsqueda avanzada dado un recurso.
+   * recorre la searchOptions y compara con el recurso dado como argumento.
+   * @param {*} element, recurso a filtrar.
+   * @returns retorna true en caso de el nombre del recurso entregado como parámetro
+   * coincida con el nombre de algún recurso de la lista que contiene los recursos a filtrar y además
+   * de que la cantidad que tenga asignado ese recurso sea mayor o igual al elemento contenido en la lista.
+   * -Retorna false, en caso de que ninguno de los recursos de la lista coincida con el elemento dado como
+   * parámetro.
    */
   function checkSearch(element) {
-    for (let index = 0; index < searchOptions.length; index++) {
-      const searchOption = searchOptions[index];
+    searchOptions.forEach((option) => {
       if (
-        element.name === searchOption.resource &&
-        parseInt(element.quantity) >= parseInt(searchOption.minAmount)
-      ) {
+        element.name === option.resource &&
+        parseInt(element.quantity) >= parseInt(option.minAmount)
+      )
         return true;
-      }
-    }
+    });
     return false;
   }
 
-  /**
-   *
-   */
-  useEffect(() => {
-    const searchOptionsAux = [];
-    for (let index = 0; index < searchOptions.length; index++) {
-      const element = searchOptions[index];
-      if (element.resource !== '' && element.minAmount !== '0') {
-        searchOptionsAux.push(element);
-      }
-    }
-    setSearchOptions(searchOptionsAux);
-
-    if (searchOptionsAux.length > 0) {
-      var count = searchOptionsAux.length;
-
-      const temp = [];
-      for (let index = 0; index < resource.length; index++) {
-        const rec = resource[index];
-        if (checkSearch(rec)) {
-          temp.push(rec.idRoom);
-        }
-      }
-
-      const aux = [];
-      var contAux = 0;
-      salas.forEach((sala) => {
-        contAux = 0;
-        temp.forEach((idSala) => {
-          if (sala.id === idSala) contAux++;
-        });
-        if (contAux === parseInt(count)) aux.push(sala);
-      });
-
-      setSalasSearch(
-        aux.filter((x) => x.name.toLowerCase().includes(search.toLowerCase()))
-      );
-
-      setFlag(true);
-    } else {
-      const aux = salas;
-      setSalasSearch(
-        aux.filter((x) => x.name.toLowerCase().includes(search.toLowerCase()))
-      );
-    }
-  }, [search]);
-
   return (
-    <>
+    <div style={{ marginTop: '2rem' }}>
       <Grid container spacing={3} direction='column'>
         <Grid item>
-          <Typography variant='h2'>Administrar salas</Typography>
+          <Typography variant='h3'>Administrar salas</Typography>
         </Grid>
         <Grid item>
           <TextField
@@ -202,118 +208,99 @@ function AdministrarSalas() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </Grid>
-        <Grid container style={{ width: '100%' }}>
+        <Grid item>
           <Accordion>
-            <AccordionSummary
-              expandIcon={<ExpandMore />}
-              aria-controls='panel1a-content'
-              id='panel1a-header'>
-              <Typography>Busqueda Avanzada</Typography>
+            <AccordionSummary expandIcon={<ExpandMore />}>
+              <Typography>Búsqueda Avanzada</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Grid
-                container
-                spacing={3}
-                direction='column'
-                width='medium'
-                justify='center'
-                alignContent='center'>
+              <Grid container spacing={3} direction='column'>
                 {searchOptions.map((searchOption, i) => (
-                  <Grid item>
-                    <Grid container>
-                      <Grid item xs>
-                        <FormControl fullWidth>
-                          <InputLabel id='select-resource-label'>
-                            Recurso
-                          </InputLabel>
-                          <Select
-                            labelId='select-resource-label'
-                            id='select-resource'
-                            value={searchOption.resource}
-                            onChange={(e) =>
-                              editSearch(i, 'resource', e.target.value)
-                            }>
-                            {options.map((option) => (
-                              <MenuItem value={option}>{option}</MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                      <Grid item xs>
-                        <TextField
-                          id='coun-resource'
-                          label='cant. Min'
-                          type='number'
+                  <Grid item container spacing={2}>
+                    <Grid item>
+                      <FormControl fullWidth>
+                        <InputLabel id='select-resource-label'>
+                          Recurso
+                        </InputLabel>
+                        <Select
+                          labelId='select-resource-label'
+                          id='select-resource'
+                          value={searchOption.resource}
                           onChange={(e) =>
-                            editSearch(i, 'minAmount', e.target.value)
+                            editSearch(i, 'resource', e.target.value)
                           }
-                        />
-                      </Grid>
-                      <Grid item xs>
-                        <IconButton onClick={() => hadlerDelete(searchOption)}>
-                          <Delete />
-                        </IconButton>
-                      </Grid>
+                          style={{ minWidth: '12rem' }}>
+                          {options.map((option) => (
+                            <MenuItem value={option}>{option}</MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid item>
+                      <TextField
+                        label='Cantidad mínima'
+                        type='number'
+                        onChange={(e) =>
+                          editSearch(i, 'minAmount', e.target.value)
+                        }
+                      />
+                    </Grid>
+                    <Grid item>
+                      <IconButton onClick={() => handleDelete(searchOption)}>
+                        <Delete />
+                      </IconButton>
                     </Grid>
                   </Grid>
                 ))}
-
                 <Button
                   onClick={() =>
                     setSearchOptions((prev) =>
                       prev.concat({ resource: '', minAmount: '0' })
                     )
                   }
-                  startIcon={<Add />}></Button>
+                  startIcon={<Add />}>
+                  Añadir filtro
+                </Button>
               </Grid>
             </AccordionDetails>
           </Accordion>
         </Grid>
 
-        <Typography variant='h2'>Lista de salas</Typography>
+        <Grid item>
+          <Typography variant='h4'>Lista de salas</Typography>
+        </Grid>
 
-        <Grid>
+        <Grid item>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell scope='col' border='bottom'>
-                  Nombre
-                </TableCell>
-                <TableCell scope='col' border='bottom'>
-                  Descripción
-                </TableCell>
-                <TableCell scope='col' border='bottom'></TableCell>
+                <TableCell>Nombre</TableCell>
+                <TableCell>Descripción</TableCell>
+                <TableCell />
               </TableRow>
             </TableHead>
             <TableBody>
               {salasSearch.map((sala) => (
-                <TableRow>
-                  <TableCell scope='col'>
+                <TableRow key={sala.id}>
+                  <TableCell>
                     <Tooltip
-                      color='rgba(0, 0, 0, 0.87)'
                       placement='right'
                       title={
-                        <Grid style={{ backgroundColor: 'white' }}>
-                          <Table>
-                            <TableHead>
-                              <TableRow>
-                                <TableCell scope='col' border='bottom'>
-                                  Recurso
-                                </TableCell>
-                                <TableCell scope='col' border='bottom'>
-                                  Cantidad
-                                </TableCell>
-                              </TableRow>
-                            </TableHead>
-                          </Table>
+                        <Table style={{ backgroundColor: 'white' }}>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Recurso</TableCell>
+                              <TableCell>Cantidad</TableCell>
+                            </TableRow>
+                          </TableHead>
                           <TableBody>
                             {resource.map((rec) =>
                               rec.idRoom === sala.id ? (
                                 <TableRow key={rec.i}>
-                                  <TableCell scope='col'>
+                                  <TableCell>
                                     <Typography>{rec.name}</Typography>
                                   </TableCell>
-                                  <TableCell scope='col'>
+                                  <TableCell>
                                     <Typography>
                                       <Typography>{rec.quantity}</Typography>
                                     </Typography>
@@ -322,15 +309,13 @@ function AdministrarSalas() {
                               ) : null
                             )}
                           </TableBody>
-                        </Grid>
+                        </Table>
                       }>
                       <Typography>{sala.name}</Typography>
                     </Tooltip>
                   </TableCell>
-                  <TableCell scope='col'>
-                    <Typography>
-                      <Typography>{sala.description}</Typography>
-                    </Typography>
+                  <TableCell>
+                    <Typography>{sala.description}</Typography>
                   </TableCell>
                   <TableCell>
                     <IconButton
@@ -351,11 +336,13 @@ function AdministrarSalas() {
           </Table>
         </Grid>
 
-        <Link to='/room'>
-          <Button startIcon={<Add />} />
-        </Link>
+        <Grid item>
+          <Link to='/room'>
+            <Button startIcon={<Add />}>Crear nueva sala</Button>
+          </Link>
+        </Grid>
       </Grid>
-    </>
+    </div>
   );
 }
 

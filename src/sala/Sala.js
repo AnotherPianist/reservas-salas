@@ -17,14 +17,16 @@ import {
   Button,
   IconButton,
   Typography,
-  Modal,
-  Box
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from '@material-ui/core';
-import { Delete, Save, Add } from '@material-ui/icons';
+import { Delete, Save, Add, Edit } from '@material-ui/icons';
 
 /**
- *
- * @returns
+ * Componente Sala.js.
+ * @returns retorna los elementos necesarios para agregar y editar la sala y sus recursos.
  */
 function Sala() {
   const { id } = useParams();
@@ -32,10 +34,9 @@ function Sala() {
   const [description, setDescription] = useState('');
   const [type, setType] = useState('');
   const [recursos, setRecursos] = useState([]);
-
-  const [showRecurso, setshowRecurso] = useState();
-  const [resourcesDeleted, setResourcesDeleted] = useState([]);
-  const [resourcesAdded, setResourcesAdded] = useState([]);
+  const [showRecurso, setshowRecurso] = useState(false);
+  const [showRecursoEdit, setshowRecursoEdit] = useState(false);
+  const [resourceEdit, setResourceEdit] = useState();
   const [flag, setFlag] = useState(false);
 
   /**
@@ -63,12 +64,13 @@ function Sala() {
           setDescription(data.description);
           setType(data.type);
         });
+
       setFlag(true);
     }
   }, []);
 
   /**
-   *  UseEffect que detecta cuando cambia la variable flag, en caso de que cambie, se renderiza
+   * UseEffect que detecta cuando cambia la variable flag, en caso de que cambie, se renderiza
    * la información de la sala.
    */
   useEffect(() => {
@@ -76,45 +78,31 @@ function Sala() {
   }, [flag]);
 
   /**
-   * Función que recibe un recurso perteneciente a la sala para eliminar.
-   * @param {*} rec, recurso a eliminar
+   * Función que elimina un recurso de la lista de recursos.
+   * @param {*} rec, recurso a eliminar.
    * Se actualiza la lista que contiene los recursos utilizando un filtro, excluyendo al recurso dado
-   * como parámetro, en caso de que el id esté definido, se agrega el id del recurso eliminado a la
-   * lista que contiene dichos recursos, para eliminarlos posteriormente de la base de datos.
+   * como parámetro.
    */
   function eliminarElemento(rec) {
     setRecursos((prevRecursos) => prevRecursos.filter((el) => el !== rec));
-    if (id) {
-      const temp = resourcesDeleted.slice();
-      temp.push(rec.id);
-      setResourcesDeleted(temp);
-    }
   }
 
   /**
-   *Función que agrega un recurso a la lista de recursos agregados por el usuario.
+   *Función que agrega un recurso a la lista de recursos .
    * @param {*} recurso, recurso a agregar a la lista de recursos.
-   * En caso que el id esté definido, se agrega el recurso a la lista de recursos agregados,
-   * que posteriormente se guardarán en la base de datos.
    */
   function agregarRecurso(recurso) {
     setRecursos((prevRecursos) => prevRecursos.concat(recurso));
-    if (id) {
-      setResourcesAdded((prevRecursos) => prevRecursos.concat(recurso));
-    }
   }
 
   /**
    * Función encargada de guardar y actualizar los cambios realizados en la sala.
+   * @returns, se retornan los recursos actualizados en la base de datos.
    * -En caso de que la sala no tenga un id creado, entonces se agregan los elementos entregados
    * por el usuario a un nuevo documento en las salas y un nuevo documento en los recursos definidos
    * en la base de datos.
-   * -En caso de que la sala ya tenga un id creado, se actualizan los datos según los datos agregados por el
-   * usuario y en el caso de los recursos se actualizan las listas de elementos agregados o
-   * eliminados de la sala (resourcesDeleted, resoursesAdded).
-   * @returns, se retornan los recursos actualizados en la base de datos.
-   *
    */
+
   function guardarHandler() {
     if (!id) {
       db.collection('rooms')
@@ -134,93 +122,153 @@ function Sala() {
         });
     } else {
       //update room
-      var room = db.collection('rooms').doc(id);
-      return (
-        room.update({
-          name: name,
-          description: description,
-          type: type
-        }),
-        //delete resources
-        resourcesDeleted.forEach((idDelete) =>
-          db.collection('resources').doc(idDelete).delete()
-        ),
-        //add new resources
-        resourcesAdded.forEach((resourcesAdd) =>
-          db.collection('resources').add({
-            idRoom: id,
-            name: resourcesAdd.name,
-            quantity: resourcesAdd.quantity
-          })
-        )
-      );
+      db.collection('rooms').doc(id).update({
+        name: name,
+        description: description,
+        type: type
+      });
+      //update resources
+      let temp = [];
+      db.collection('resources')
+        .where('idRoom', '==', id)
+        .get()
+        .then((prev) => {
+          prev.forEach((element) => {
+            temp.push(element.id);
+          });
+          temp.forEach((element) => {
+            db.collection('resources').doc(element).delete();
+          });
+
+          recursos.forEach((element) => {
+            db.collection('resources').add({
+              idRoom: id,
+              name: element.name,
+              quantity: element.quantity
+            });
+          });
+        });
     }
   }
 
   let history = useHistory();
 
   /**
-   * @param {*} props, no se utilizan props.
-   * @returns, retorna o renderiza el Modal para agregar los recursos a la sala.
-   * Para controlar la aparición del componente se hace a través de la variable showRecurso,
+   * @param {*} show, de tipo boolean para determinar si mostrar o no la ventana para agregar recursos.
+   * @param {*} setshow, función para cambiar el valor de la variable show.
+   * @param {*} typeEdit, valor del recurso a editar en el Select.
+   * @param {*} quantityEdit, valor de la cantidad de recursos a editar.
+   * @returns, retorna o renderiza la ventana para agregar los recursos a la sala.
+   * Para controlar la aparición del componente se hace a través de la variable show,
    * dentro de componente modal se hace un llamado al componente ResourseSelect, utilizado para seleccionar
    * un recurso ya creado o para agregar uno nuevo, además se muestra el componente TextField para ingresar la
    * cantidad del recurso seleccionado, además se muestra un último componente con el ícono de un disquete
    * para guardar los cambios realizados.
    */
-  function Recurso(props) {
+  function Recurso({ show, setshow, typeEdit, quantityEdit }) {
     const [quantity, setQuantity] = useState('');
     const [type, setType] = useState('');
 
+    /**
+     * UseEffect que se utiliza para actualizar los valores de las variables quantity y type, los cuales
+     * son los valores que puede tomar el recurso y su cantidad.
+     *
+     */
+    useEffect(() => {
+      if (typeEdit && quantityEdit) {
+        setQuantity(quantityEdit);
+        setType(typeEdit);
+      }
+    }, []);
+
     return (
-      <Modal
-        open={showRecurso}
-        onClose={() => setshowRecurso(false)}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-        <Box bgcolor='white' padding={8}>
-          <Typography variant='h5'>Recurso</Typography>
-
-          <ResourceSelect
-            id='company-name'
-            name='company-name'
-            onParentChange={(newValue) => {
-              setType(newValue.label);
-            }}
-          />
-
+      <Dialog fullWidth open={show} onClose={() => setshow(false)}>
+        <DialogTitle>Recurso</DialogTitle>
+        <DialogContent>
+          {!typeEdit ? (
+            <ResourceSelect
+              style={{ zindex: 1 }}
+              onParentChange={(newValue) => {
+                setType(newValue.label);
+              }}
+            />
+          ) : (
+            <TextField
+              fullWidth
+              disabled
+              label='Tipo'
+              variant='outlined'
+              value={type}
+              onChange={(e) => setQuantity(e.target.value)}
+            />
+          )}
           <TextField
-            id='coun-resource'
+            fullWidth
             label='Cantidad'
             type='number'
+            value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
           />
-
-          <IconButton
+          {!checkNewResource(type) && !typeEdit && type !== '' && (
+            <Typography color='error'>Este recurso ya existe</Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button
+            disabled={
+              (!checkNewResource(type) && !typeEdit) ||
+              type === '' ||
+              quantity === ''
+            }
+            startIcon={<Save />}
             onClick={() => {
-              agregarRecurso({
-                name: type,
-                quantity: quantity
-              });
-              setshowRecurso(false);
+              if (!typeEdit) {
+                agregarRecurso({
+                  name: type,
+                  quantity: quantity
+                });
+                setshowRecurso(false);
+              } else {
+                for (let index = 0; index < recursos.length; index++) {
+                  if (recursos[index].name === type) {
+                    recursos[index].quantity = quantity;
+                    setshowRecursoEdit(false);
+                    return;
+                  }
+                }
+              }
             }}>
-            <Save />
-          </IconButton>
-        </Box>
-      </Modal>
+            Guardar
+          </Button>
+        </DialogActions>
+      </Dialog>
     );
   }
 
-  /*
+  function checkNewResource(resource) {
+    for (let index = 0; index < recursos.length; index++) {
+      if (recursos[index].name === resource) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
    * Retorno del componente Sala.js, que se encarga de renderizar la sección de edición y agregación
    * de una sala.
    */
   return (
     <>
-      {showRecurso && <Recurso />}
+      {showRecurso && <Recurso show={showRecurso} setshow={setshowRecurso} />}
+      {showRecursoEdit && (
+        <Recurso
+          show={showRecursoEdit}
+          setshow={setshowRecursoEdit}
+          typeEdit={resourceEdit.name}
+          quantityEdit={resourceEdit.quantity}
+        />
+      )}
 
       <Grid container direction='column' spacing={4}>
         {/*Input name*/}
@@ -310,6 +358,13 @@ function Sala() {
                           <IconButton onClick={() => eliminarElemento(rec)}>
                             <Delete />
                           </IconButton>
+                          <IconButton
+                            onClick={() => {
+                              setResourceEdit(rec);
+                              setshowRecursoEdit(true);
+                            }}>
+                            <Edit />
+                          </IconButton>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -326,13 +381,15 @@ function Sala() {
         </Grid>
         {/*button save*/}
         <Grid item>
-          <IconButton
+          <Button
+            disabled={name === '' || description === '' || type === ''}
+            startIcon={<Save />}
             onClick={() => {
               guardarHandler();
               history.replace('/');
             }}>
-            <Save />
-          </IconButton>
+            Guardar
+          </Button>
         </Grid>
       </Grid>
     </>

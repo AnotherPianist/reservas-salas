@@ -14,7 +14,7 @@ import ListIcon from '@material-ui/icons/List';
 import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';
 
 /**
- *
+ * Estilos de la barra lateral.
  */
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 /**
- *
+ * Elementos visualizados en la barra lateral.
  */
 const items = [
   {
@@ -46,8 +46,8 @@ const items = [
 ];
 
 /**
- *
- * @returns
+ * Función principal del componente BarraLateral.js
+ * @returns retorna y renderiza los elementos pertenecientes a la barra lateral.
  */
 function BarraLateral() {
   const classes = useStyles();

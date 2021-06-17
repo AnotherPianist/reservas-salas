@@ -11,9 +11,9 @@ import { Container, Grid, Typography } from '@material-ui/core';
 moment.locale('es');
 
 /**
- *
- * @param {*} param0
- * @returns
+ * Función principal del componente CalendarView.js
+ * @param {*} roomProp, Propiedades de la sala seleccionada para visualizar sus reservas.
+ * @returns retorna y renderiza la visualización del calendario y sus reservas.
  */
 function CalendarView({ roomProp }) {
   const { roomId } = useParams();
@@ -25,7 +25,7 @@ function CalendarView({ roomProp }) {
   const [eventSelected, setEventSelected] = useState();
 
   /**
-   *
+   * Variable encargada de dejar los elementos del calendario en espanol.
    */
   const messages = {
     allDay: 'Todo el día',
@@ -46,7 +46,9 @@ function CalendarView({ roomProp }) {
   const localizer = momentLocalizer(moment);
 
   /**
-   *
+   * UseEffect que se ejecuta cada vez que haya un cambio en la variable "room" y está
+   * encargado de obtener las reservas de la base de datos, encontradas en el documento de
+   * "rooms" dado el id de la variable "room" dentro del documento llamado "bookings".
    */
   useEffect(() => {
     const unsubscribe = db
@@ -117,9 +119,9 @@ function CalendarView({ roomProp }) {
 }
 
 /**
- *
- * @param {*} param0
- * @returns
+ * @param {*} event, parámetro con contiene el titulo de la reserva y el nombre de usuario de la
+ * persona que hace o a quién pertenece la reserva.
+ * @returns retorna y renderiza la reserva dentro de un determinado horario.
  */
 function CalendarEvent({ event }) {
   return (

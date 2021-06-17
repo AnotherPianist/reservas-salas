@@ -11,14 +11,19 @@ import {
   MenuItem,
   Button
 } from '@material-ui/core';
+import { DatePicker } from '@material-ui/pickers';
 import React, { useState } from 'react';
 import { db } from '../firebase';
 import useAuth from '../providers/Auth';
 
 /**
  *
- * @param {*} param0
- * @returns
+ * @param {*} close, función para cerrar la ventana de realización de reserva
+ * @param {*} show, de tipo boolean, que determina si se muestra o no la ventana de realización de reserva.
+ * @param {*} event, evento de presionar una reserva ya hecha, para editarla.
+ * @param {*} roomId, id de la sala a la que pertenecen las reservas.
+ * @param {*} selection, evento de seleccionar en un determinado horario.
+ * @returns retorna y renderiza la ventana de realización de una reserva.
  */
 function EventView({ close, show, event, roomId, selection }) {
   const { user } = useAuth();
@@ -39,7 +44,10 @@ function EventView({ close, show, event, roomId, selection }) {
   );
 
   /**
-   *
+   * Función para agregar una reserva a la base de datos, donde se crea el objeto evento con
+   * los campos username, title, details, start (horas) y end (horas).
+   * La reserva se agrega al documento "rooms", dado el id de la sala "roomId" y dejándola dentro
+   * del documento "bookings".
    */
   function handleBook() {
     const startDate = new Date(date);
@@ -58,7 +66,8 @@ function EventView({ close, show, event, roomId, selection }) {
   }
 
   /**
-   *
+   * Función encargada de editar o actualizar los datos de una reserva en el documento
+   * "rooms" dado el id "roomId" dentro de la colección "bookings".
    */
   function handleEdit() {
     const startDate = new Date(date);
@@ -81,7 +90,8 @@ function EventView({ close, show, event, roomId, selection }) {
   }
 
   /**
-   *
+   * Función encargada de eliminar una reserva dentro de la base de datos según el id de la sala a la
+   * que pertenece, eliminando la reserva de id "event.id".
    */
   function handleDelete() {
     db.collection('rooms')
@@ -93,7 +103,7 @@ function EventView({ close, show, event, roomId, selection }) {
   }
 
   /**
-   *
+   * Opciones de elección de horas para reservar.
    */
   const options = [
     '9:40',
@@ -144,19 +154,14 @@ function EventView({ close, show, event, roomId, selection }) {
             />
           </Grid>
           <Grid item>
-            <TextField
+            <DatePicker
               fullWidth
-              id='date'
+              disableToolbar
+              variant='inline'
+              format='dd/MM/yyyy'
               label='Fecha'
-              format='dd/mm/yy'
-              type='date'
               value={date}
-              onChange={({ value }) => {
-                setDate(value);
-              }}
-              InputLabelProps={{
-                shrink: true
-              }}
+              onChange={setDate}
             />
           </Grid>
           <Grid item>

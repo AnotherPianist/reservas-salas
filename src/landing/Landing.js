@@ -12,7 +12,7 @@ import {
 } from '@material-ui/core';
 
 /**
- *
+ * Estilos para el fondo y el login.
  */
 const useStyles = makeStyles({
   root: {
@@ -34,8 +34,8 @@ const useStyles = makeStyles({
 });
 
 /**
- *
- * @returns
+ * Función principal de Landing.js
+ * @returns retorna y renderiza los elementos visualizados en la sección del login de la página.
  */
 function Landing() {
   const [email, setEmail] = useState('');
@@ -44,6 +44,14 @@ function Landing() {
   const [error, setError] = useState(false);
   const { login } = useAuth();
   const classes = useStyles();
+
+  /**
+   * Función que se ejecuta al loguear en la página.
+   * @param {*} e, no utilizado, sin embargo es el evento de presionar la tecla "Enter" o presionar el botón "Ingresar"
+   * Se encarga de mostrar la animación de cargando por la pantalla y de validar tanto el correo
+   * y la contraseña ingresados en el login, en caso de ser correctos se redirige al usuario a su sección
+   * correspondiente, en caso contrario se muestra un error al intentar loguear.
+   */
   function handleOnSubmit(e) {
     setLoading(true);
     setError(false);
