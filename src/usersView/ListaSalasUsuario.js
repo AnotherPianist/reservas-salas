@@ -31,7 +31,6 @@ function ListaSalasUsuario() {
   const [search, setSearch] = useState('');
   const [salas, setSalas] = useState([]);
   const [options, setOptions] = useState([]);
-  const [flag, setFlag] = useState([]);
   const [resource, setResources] = useState([]);
   const [searchOptions, setSearchOptions] = useState([]);
   const [salasSearch, setSalasSearch] = useState(salas);
@@ -83,12 +82,44 @@ function ListaSalasUsuario() {
   }, []);
 
   /**
-   * UseEffect que detecta cuando cambia la variable flag, en caso de que cambie, se renderiza
-   * la información de las salas y sus recursos.
+   * UseEffect encargado de ejecutarse cada vez que haya algún cambio en la variable search, su
+   * objetivo es actualizar las salas a mostrar en caso de que cumplan tanto con la búsqueda de
+   * nombre de salas como con la búsqueda avanzada.
+   * Los pasos que realiza son en primer lugar recorrer la lista de recursos para filtrar en la
+   * búsqueda avanzada, para limpiarla en caso de que no se seleccione recurso y cantidad, luego:
+   * -En caso de que la lista tenga algún elemento, se recorre la lista de recursos general y en
+   * caso de que checkSearch retorne true, se agregará el id de la sala a la que pertenece el
+   * recurso a una lista temporal y posteriormente se agregan las salas a una nueva lista que
+   * coincidan con el id obtenido anteriormente, finalmente se aplica la busqueda por nombre
+   * sobre la lista de salas final.
+   * -En caso de que la lista esté vacía solo se aplica la búsqueda por nombre sobre la lista de salas.
    */
   useEffect(() => {
-    setFlag(false);
-  }, [flag]);
+    if (searchOptions) {
+      const temp = [];
+      resource.forEach((rec) => {
+        if (checkSearch(rec)) temp.push(rec.idRom);
+      });
+
+      const aux = [];
+      salas.forEach((sala) => {
+        let contAux = 0;
+        temp.forEach((idSala) => {
+          if (sala.id === idSala) contAux++;
+        });
+        if (contAux === searchOptions.length) aux.push(sala);
+      });
+
+      setSalasSearch(
+        aux.filter((x) => x.name.toLowerCase().includes(search.toLowerCase()))
+      );
+    } else {
+      const aux = salas;
+      setSalasSearch(
+        aux.filter((x) => x.name.toLowerCase().includes(search.toLowerCase()))
+      );
+    }
+  }, [search, searchOptions]);
 
   /**
    * Función ecargada de editar la lista de recursos que se tiene para filtrar.
@@ -100,7 +131,6 @@ function ListaSalasUsuario() {
     const temp = searchOptions;
     temp[index][camp] = newValue;
     setSearchOptions(temp);
-    setFlag(true);
   }
 
   /**
@@ -132,60 +162,6 @@ function ListaSalasUsuario() {
     }
     return false;
   }
-
-  /**
-   * UseEffect encargado de ejecutarse cada vez que haya algún cambio en la variable search, su
-   * objetivo es actualizar las salas a mostrar en caso de que cumplan tanto con la búsqueda de
-   * nombre de salas como con la búsqueda avanzada.
-   * Los pasos que realiza son en primer lugar recorrer la lista de recursos para filtrar en la
-   * búsqueda avanzada, para limpiarla en caso de que no se seleccione recurso y cantidad, luego:
-   * -En caso de que la lista tenga algún elemento, se recorre la lista de recursos general y en
-   * caso de que checkSearch retorne true, se agregará el id de la sala a la que pertenece el
-   * recurso a una lista temporal y posteriormente se agregan las salas a una nueva lista que
-   * coincidan con el id obtenido anteriormente, finalmente se aplica la busqueda por nombre
-   * sobre la lista de salas final.
-   * -En caso de que la lista esté vacía solo se aplica la búsqueda por nombre sobre la lista de salas.
-   */
-  useEffect(() => {
-    const searchOptionsAux = [];
-    for (let index = 0; index < searchOptions.length; index++) {
-      const element = searchOptions[index];
-      if (element.resource !== '' && element.minAmount !== '0')
-        searchOptionsAux.push(element);
-    }
-    setSearchOptions(searchOptionsAux);
-
-    if (searchOptionsAux.length > 0) {
-      var count = searchOptionsAux.length;
-
-      const temp = [];
-      for (let index = 0; index < resource.length; index++) {
-        const rec = resource[index];
-        if (checkSearch(rec)) temp.push(rec.idRoom);
-      }
-
-      const aux = [];
-      var contAux = 0;
-      salas.forEach((sala) => {
-        contAux = 0;
-        temp.forEach((idSala) => {
-          if (sala.id === idSala) contAux++;
-        });
-        if (contAux === parseInt(count)) aux.push(sala);
-      });
-
-      setSalasSearch(
-        aux.filter((x) => x.name.toLowerCase().includes(search.toLowerCase()))
-      );
-
-      setFlag(true);
-    } else {
-      const aux = salas;
-      setSalasSearch(
-        aux.filter((x) => x.name.toLowerCase().includes(search.toLowerCase()))
-      );
-    }
-  }, [search, searchOptions]);
 
   return (
     <Grid container spacing={3} direction='column'>

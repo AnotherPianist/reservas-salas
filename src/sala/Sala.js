@@ -30,6 +30,7 @@ import { Delete, Save, Add, Edit } from '@material-ui/icons';
  */
 function Sala() {
   const { id } = useParams();
+  const history = useHistory();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [type, setType] = useState('');
@@ -37,7 +38,6 @@ function Sala() {
   const [showRecurso, setshowRecurso] = useState(false);
   const [showRecursoEdit, setshowRecursoEdit] = useState(false);
   const [resourceEdit, setResourceEdit] = useState();
-  const [flag, setFlag] = useState(false);
 
   /**
    * UseEffect ejecutado en caso de que exista el id de la sala que se quiere mostrar, principalmente
@@ -64,18 +64,8 @@ function Sala() {
           setDescription(data.description);
           setType(data.type);
         });
-
-      setFlag(true);
     }
   }, []);
-
-  /**
-   * UseEffect que detecta cuando cambia la variable flag, en caso de que cambie, se renderiza
-   * la información de la sala.
-   */
-  useEffect(() => {
-    setFlag(false);
-  }, [flag]);
 
   /**
    * Función que elimina un recurso de la lista de recursos.
@@ -102,7 +92,6 @@ function Sala() {
    * por el usuario a un nuevo documento en las salas y un nuevo documento en los recursos definidos
    * en la base de datos.
    */
-
   function guardarHandler() {
     if (!id) {
       db.collection('rooms')
@@ -150,8 +139,6 @@ function Sala() {
         });
     }
   }
-
-  let history = useHistory();
 
   /**
    * @param {*} show, de tipo boolean para determinar si mostrar o no la ventana para agregar recursos.
@@ -373,7 +360,6 @@ function Sala() {
 
                 <Button
                   startIcon={<Add />}
-                  alignSelf='start'
                   onClick={() => setshowRecurso(true)}></Button>
               </Grid>
             </Grid>

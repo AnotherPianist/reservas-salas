@@ -17,7 +17,7 @@ moment.locale('es');
  */
 function CalendarView({ roomProp }) {
   const { roomId } = useParams();
-  const [room, setRoom] = useState(roomProp ? roomProp : roomId);
+  const room = roomProp ? roomProp : roomId;
   const [showCreateEventDialog, setShowCreateEventDialog] = useState(false);
   const [showEventDialogDetails, setShowEventDialogDetails] = useState(false);
   const [events, setEvents] = useState([]);
