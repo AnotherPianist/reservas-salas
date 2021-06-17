@@ -55,6 +55,7 @@ function EventView({ close, show, event, roomId, selection }) {
     const endDate = new Date(date);
     endDate.setHours(...endHour.split(':'), 0);
     const event = {
+      userId: user.uid,
       username: user.displayName,
       title: title,
       details: details,
@@ -203,17 +204,20 @@ function EventView({ close, show, event, roomId, selection }) {
       </DialogContent>
       <DialogActions>
         {event ? (
-          <>
-            <Button color='secondary' onClick={handleDelete}>
-              Eliminar
-            </Button>
-            <Button
-              color='primary'
-              disabled={title.length === 0}
-              onClick={handleEdit}>
-              Confirmar edición
-            </Button>
-          </>
+          user.admin ||
+          (user.uid === event.userId && (
+            <>
+              <Button color='secondary' onClick={handleDelete}>
+                Eliminar
+              </Button>
+              <Button
+                color='primary'
+                disabled={title.length === 0}
+                onClick={handleEdit}>
+                Confirmar edición
+              </Button>
+            </>
+          ))
         ) : (
           <Button
             disabled={title.length === 0}

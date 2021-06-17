@@ -15,7 +15,7 @@ import { Container } from '@material-ui/core';
 function PrincipalAdmin() {
   return (
     <div style={{ display: 'flex' }}>
-      <BarraLateral />
+      {/*<BarraLateral />*/}
       <Container>
         <Switch>
           <Route exact path='/'>
