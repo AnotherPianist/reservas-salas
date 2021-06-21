@@ -128,7 +128,7 @@ function ListaSalasUsuario() {
    * @param {*} newValue, nuevo valor en que se agregará (tipo de recurso o cantidad de recurso)
    */
   function editSearch(index, camp, newValue) {
-    const temp = searchOptions;
+    const temp = searchOptions.slice();
     temp[index][camp] = newValue;
     setSearchOptions(temp);
   }
@@ -152,14 +152,13 @@ function ListaSalasUsuario() {
    * parámetro.
    */
   function checkSearch(element) {
-    for (let index = 0; index < searchOptions.length; index++) {
-      const searchOption = searchOptions[index];
+    searchOptions.forEach((option) => {
       if (
-        element.name === searchOption.resource &&
-        parseInt(element.quantity) >= parseInt(searchOption.minAmount)
+        element.name === option.resource &&
+        parseInt(element.quantity) >= parseInt(option.minAmount)
       )
         return true;
-    }
+    });
     return false;
   }
 
@@ -208,6 +207,7 @@ function ListaSalasUsuario() {
                     <TextField
                       label='Cantidad mínima'
                       type='number'
+                      value={searchOption.minAmount}
                       onChange={(e) =>
                         editSearch(i, 'minAmount', e.target.value)
                       }

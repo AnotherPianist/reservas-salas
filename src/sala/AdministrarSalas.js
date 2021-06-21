@@ -160,7 +160,7 @@ function AdministrarSalas() {
    * @param {*} newValue, nuevo valor en que se agregará (tipo de recurso o cantidad de recurso)
    */
   function editSearch(index, camp, newValue) {
-    const temp = searchOptions;
+    const temp = searchOptions.slice();
     temp[index][camp] = newValue;
     setSearchOptions(temp);
   }
@@ -240,6 +240,7 @@ function AdministrarSalas() {
                       <TextField
                         label='Cantidad mínima'
                         type='number'
+                        value={searchOption.minAmount}
                         onChange={(e) =>
                           editSearch(i, 'minAmount', e.target.value)
                         }

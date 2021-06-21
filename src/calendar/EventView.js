@@ -204,8 +204,7 @@ function EventView({ close, show, event, roomId, selection }) {
       </DialogContent>
       <DialogActions>
         {event ? (
-          user.admin ||
-          (user.uid === event.userId && (
+          (user.admin || user.uid === event.userId) && (
             <>
               <Button color='secondary' onClick={handleDelete}>
                 Eliminar
@@ -217,7 +216,7 @@ function EventView({ close, show, event, roomId, selection }) {
                 Confirmar edición
               </Button>
             </>
-          ))
+          )
         ) : (
           <Button
             disabled={title.length === 0}
