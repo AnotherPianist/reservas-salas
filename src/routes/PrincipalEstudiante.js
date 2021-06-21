@@ -13,19 +13,23 @@ import MisReservas from '../usersView/MisReservas';
 
 function PrincipalEstudiante() {
   return (
-    <Container style={{ marginTop: '2rem' }}>
-      <Switch>
-        <Route exact path='/'>
+    <Switch>
+      <Route exact path='/'>
+        <Container style={{ marginTop: '2rem' }}>
           <ListaSalasUsuario />
-        </Route>
-        <Route path='/calendar/:roomId'>
+        </Container>
+      </Route>
+      <Route path='/calendar/:roomId'>
+        <Container maxWidth='xl' style={{ marginTop: '2rem' }}>
           <CalendarView />
-        </Route>
-        <Route path='/my-reservations'>
+        </Container>
+      </Route>
+      <Route path='/my-reservations'>
+        <Container style={{ marginTop: '2rem' }}>
           <MisReservas />
-        </Route>
-      </Switch>
-    </Container>
+        </Container>
+      </Route>
+    </Switch>
   );
 }
 

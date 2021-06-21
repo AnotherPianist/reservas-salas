@@ -335,7 +335,8 @@ function AdministrarSalas() {
             </TableBody>
           </Table>
         </Grid>
-
+      </Grid>
+      <Grid container direction='column' alignItems='flex-end' spacing={4}>
         <Grid item>
           <Link to='/room'>
             <Button startIcon={<Add />}>Crear nueva sala</Button>

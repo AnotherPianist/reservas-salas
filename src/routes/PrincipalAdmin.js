@@ -13,24 +13,28 @@ import { Container } from '@material-ui/core';
 
 function PrincipalAdmin() {
   return (
-    <div style={{ display: 'flex' }}>
-      <Container>
-        <Switch>
-          <Route exact path='/'>
-            <AdministrarSalas />
-          </Route>
-          <Route exact path='/room'>
-            <Sala />
-          </Route>
-          <Route path='/room/:id'>
-            <Sala />
-          </Route>
-          <Route path='/calendar/:roomId'>
-            <CalendarView />
-          </Route>
-        </Switch>
-      </Container>
-    </div>
+    <Switch>
+      <Route exact path='/'>
+        <Container style={{ marginTop: '2rem' }}>
+          <AdministrarSalas />
+        </Container>
+      </Route>
+      <Route exact path='/room'>
+        <Container style={{ marginTop: '2rem' }}>
+          <Sala />
+        </Container>
+      </Route>
+      <Route path='/room/:id'>
+        <Container style={{ marginTop: '2rem' }}>
+          <Sala />
+        </Container>
+      </Route>
+      <Route path='/calendar/:roomId'>
+        <Container maxWidth='xl' style={{ marginTop: '2rem' }}>
+          <CalendarView />
+        </Container>
+      </Route>
+    </Switch>
   );
 }
 

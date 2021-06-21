@@ -4,9 +4,10 @@ import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'moment/locale/es';
 import EventView from './EventView';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { db } from '../firebase';
-import { Container, Grid, Typography } from '@material-ui/core';
+import { Button, Grid, Typography } from '@material-ui/core';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 moment.locale('es');
 
@@ -17,6 +18,7 @@ moment.locale('es');
  */
 function CalendarView({ roomProp }) {
   const { roomId } = useParams();
+  const history = useHistory();
   const room = roomProp ? roomProp : roomId;
   const [showCreateEventDialog, setShowCreateEventDialog] = useState(false);
   const [showEventDialogDetails, setShowEventDialogDetails] = useState(false);
@@ -72,49 +74,57 @@ function CalendarView({ roomProp }) {
   }, [room]);
 
   return (
-    <Container>
-      <Grid>
-        <Calendar
-          views={['work_week', 'agenda']}
-          defaultView='work_week'
-          min={new Date(0, 0, 0, 8, 30, 0)}
-          max={new Date(0, 0, 0, 20, 0, 0)}
-          localizer={localizer}
-          events={events}
-          timeslots={1}
-          step={70}
-          selectable={true}
-          messages={messages}
-          onSelectEvent={(e) => {
-            setEventSelected(e);
-            setShowEventDialogDetails(true);
-          }}
-          onSelectSlot={(e) => {
-            setSelection(e);
-            setShowCreateEventDialog(true);
-          }}
-          components={{
-            event: CalendarEvent
-          }}
-        />
-        {showCreateEventDialog && (
-          <EventView
-            show={showCreateEventDialog}
-            close={() => setShowCreateEventDialog(false)}
-            roomId={room}
-            selection={selection}
-          />
-        )}
-        {showEventDialogDetails && (
-          <EventView
-            show={showEventDialogDetails}
-            close={() => setShowEventDialogDetails(false)}
-            roomId={room}
-            event={eventSelected}
-          />
-        )}
+    <div>
+      <Grid container justify='flex-end' style={{ marginBottom: '2rem' }}>
+        <Grid item>
+          <Button
+            size='large'
+            startIcon={<ArrowBackIcon />}
+            onClick={() => history.push('/')}>
+            Volver
+          </Button>
+        </Grid>
       </Grid>
-    </Container>
+      <Calendar
+        views={['work_week', 'agenda']}
+        defaultView='work_week'
+        min={new Date(0, 0, 0, 8, 30, 0)}
+        max={new Date(0, 0, 0, 20, 0, 0)}
+        localizer={localizer}
+        events={events}
+        timeslots={1}
+        step={70}
+        selectable={true}
+        messages={messages}
+        onSelectEvent={(e) => {
+          setEventSelected(e);
+          setShowEventDialogDetails(true);
+        }}
+        onSelectSlot={(e) => {
+          setSelection(e);
+          setShowCreateEventDialog(true);
+        }}
+        components={{
+          event: CalendarEvent
+        }}
+      />
+      {showCreateEventDialog && (
+        <EventView
+          show={showCreateEventDialog}
+          close={() => setShowCreateEventDialog(false)}
+          roomId={room}
+          selection={selection}
+        />
+      )}
+      {showEventDialogDetails && (
+        <EventView
+          show={showEventDialogDetails}
+          close={() => setShowEventDialogDetails(false)}
+          roomId={room}
+          event={eventSelected}
+        />
+      )}
+    </div>
   );
 }
 

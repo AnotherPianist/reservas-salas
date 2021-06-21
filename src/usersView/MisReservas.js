@@ -34,6 +34,7 @@ function MisReservas() {
                 temp.push({
                   id: booking.id,
                   roomId: room.id,
+                  roomName: room.data().name,
                   ...data,
                   start: data.start.toDate(),
                   end: data.end.toDate()
@@ -62,7 +63,7 @@ function MisReservas() {
                   setShow(true);
                 }}>
                 <ListItemText
-                  primary={`${booking.title}  ·  ${booking.details}`}
+                  primary={`${booking.title}  ·  ${booking.roomName}`}
                   secondary={`${booking.start.toLocaleDateString()} · De ${booking.start.getHours()}:${booking.start.getMinutes()} hasta ${booking.end.getHours()}:${booking.end.getMinutes()}`}
                 />
               </ListItem>

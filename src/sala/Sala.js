@@ -312,11 +312,11 @@ function Sala() {
           </FormControl>
         </Grid>
 
-        {/*table resourse*/}
+        {/*table resource*/}
         <Grid item>
           <Grid container direction='column'>
             <Grid item>
-              <Typography size='xlarge'>Recursos</Typography>
+              <Typography variant='h6'>Recursos</Typography>
             </Grid>
             <Grid item>
               <Grid>
@@ -357,25 +357,32 @@ function Sala() {
                     ))}
                   </TableBody>
                 </Table>
-
-                <Button
-                  startIcon={<Add />}
-                  onClick={() => setshowRecurso(true)}></Button>
+                <Grid container justify='flex-end'>
+                  <Grid item>
+                    <Button
+                      startIcon={<Add />}
+                      onClick={() => setshowRecurso(true)}>
+                      Añadir recurso
+                    </Button>
+                  </Grid>
+                </Grid>
               </Grid>
             </Grid>
           </Grid>
         </Grid>
         {/*button save*/}
-        <Grid item>
-          <Button
-            disabled={name === '' || description === '' || type === ''}
-            startIcon={<Save />}
-            onClick={() => {
-              guardarHandler();
-              history.replace('/');
-            }}>
-            Guardar
-          </Button>
+        <Grid item container justify='center'>
+          <Grid item>
+            <Button
+              disabled={name === '' || description === '' || type === ''}
+              startIcon={<Save />}
+              onClick={() => {
+                guardarHandler();
+                history.replace('/');
+              }}>
+              Guardar
+            </Button>
+          </Grid>
         </Grid>
       </Grid>
     </>
