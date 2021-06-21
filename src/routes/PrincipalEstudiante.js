@@ -3,6 +3,7 @@ import { Container } from '@material-ui/core';
 import { Route, Switch } from 'react-router-dom';
 import CalendarView from '../calendar/CalendarView';
 import ListaSalasUsuario from '../usersView/ListaSalasUsuario';
+import MisReservas from '../usersView/MisReservas';
 
 /**
  * Función principal del componente PrincipalEstudiante.js
@@ -19,6 +20,9 @@ function PrincipalEstudiante() {
         </Route>
         <Route path='/calendar/:roomId'>
           <CalendarView />
+        </Route>
+        <Route path='/my-reservations'>
+          <MisReservas />
         </Route>
       </Switch>
     </Container>

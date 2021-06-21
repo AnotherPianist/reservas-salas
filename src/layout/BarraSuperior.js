@@ -9,6 +9,7 @@ import {
   Toolbar
 } from '@material-ui/core';
 import HomeIcon from '@material-ui/icons/Home';
+import { Typography } from '@material-ui/core';
 
 /**
  * Estilos de la barra superior.
@@ -24,8 +25,8 @@ const useStyles = makeStyles((theme) => ({
  * @returns retorna y renderiza los elementos pertenecientes a la barra superior.
  */
 function BarraSuperior() {
-  const { logout } = useAuth();
-  let history = useHistory();
+  const { user, logout } = useAuth();
+  const history = useHistory();
   const classes = useStyles();
 
   return (
@@ -34,7 +35,16 @@ function BarraSuperior() {
         <IconButton color='inherit' onClick={() => history.push('/')}>
           <HomeIcon />
         </IconButton>
+        <Typography variant='h6'>Reserva de salas</Typography>
         <div style={{ flexGrow: 1 }} />
+        {!user.admin && (
+          <Button
+            color='inherit'
+            style={{ marginRight: '2rem' }}
+            onClick={() => history.push('/my-reservations')}>
+            Ver mis reservas
+          </Button>
+        )}
         <Button
           color='inherit'
           onClick={() => {
