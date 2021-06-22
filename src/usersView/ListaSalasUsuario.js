@@ -15,8 +15,15 @@ import {
   ListItemText,
   MenuItem,
   Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   TextField,
-  Typography
+  Tooltip,
+  Typography,
+  withStyles
 } from '@material-ui/core';
 import { Delete, ExpandMore, Add } from '@material-ui/icons';
 import React from 'react';
@@ -162,6 +169,16 @@ function ListaSalasUsuario() {
     return false;
   }
 
+  const HtmlTooltip = withStyles((theme) => ({
+    tooltip: {
+      backgroundColor: '#f5f5f9',
+      color: 'rgba(0, 0, 0, 0.87)',
+      maxWidth: 220,
+      fontSize: theme.typography.pxToRem(12),
+      border: '1px solid #dadde9'
+    }
+  }))(Tooltip);
+
   return (
     <Grid container spacing={3} direction='column'>
       <Grid item>
@@ -237,12 +254,44 @@ function ListaSalasUsuario() {
       <Grid item>
         <List>
           {salasSearch.map((sala) => (
-            <ListItem
-              button
-              key={sala.id}
-              onClick={() => history.push(`/calendar/${sala.id}`)}>
-              <ListItemText primary={sala.name} secondary={sala.description} />
-            </ListItem>
+            <HtmlTooltip
+              title={
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Recurso</TableCell>
+                      <TableCell>Cantidad</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {resource.map(
+                      (rec) =>
+                        rec.idRoom === sala.id && (
+                          <TableRow key={rec.i}>
+                            <TableCell>
+                              <Typography>{rec.name}</Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography>
+                                <Typography>{rec.quantity}</Typography>
+                              </Typography>
+                            </TableCell>
+                          </TableRow>
+                        )
+                    )}
+                  </TableBody>
+                </Table>
+              }>
+              <ListItem
+                button
+                key={sala.id}
+                onClick={() => history.push(`/calendar/${sala.id}`)}>
+                <ListItemText
+                  primary={sala.name}
+                  secondary={sala.description}
+                />
+              </ListItem>
+            </HtmlTooltip>
           ))}
         </List>
       </Grid>
