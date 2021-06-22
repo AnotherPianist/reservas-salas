@@ -171,34 +171,44 @@ function Sala() {
     return (
       <Dialog fullWidth open={show} onClose={() => setshow(false)}>
         <DialogTitle>Recurso</DialogTitle>
-        <DialogContent>
-          {!typeEdit ? (
-            <ResourceSelect
-              style={{ zindex: 1 }}
-              onParentChange={(newValue) => {
-                setType(newValue.label);
-              }}
-            />
-          ) : (
-            <TextField
-              fullWidth
-              disabled
-              label='Tipo'
-              variant='outlined'
-              value={type}
-              onChange={(e) => setQuantity(e.target.value)}
-            />
-          )}
-          <TextField
-            fullWidth
-            label='Cantidad'
-            type='number'
-            value={quantity}
-            onChange={(e) => setQuantity(e.target.value)}
-          />
-          {!checkNewResource(type) && !typeEdit && type !== '' && (
-            <Typography color='error'>Este recurso ya existe</Typography>
-          )}
+        <DialogContent style={{ minHeight: '60vh' }}>
+          <Grid container direction='column' spacing={4}>
+            {!typeEdit ? (
+              <Grid item>
+                <ResourceSelect
+                  style={{ zIndex: 99999999 }}
+                  onParentChange={(newValue) => {
+                    setType(newValue.label);
+                  }}
+                />
+              </Grid>
+            ) : (
+              <Grid item>
+                <TextField
+                  fullWidth
+                  disabled
+                  label='Tipo'
+                  variant='outlined'
+                  value={type}
+                  onChange={(e) => setQuantity(e.target.value)}
+                />
+              </Grid>
+            )}
+            <Grid item>
+              <TextField
+                fullWidth
+                label='Cantidad'
+                type='number'
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+              />
+            </Grid>
+            {!checkNewResource(type) && !typeEdit && type !== '' && (
+              <Grid item>
+                <Typography color='error'>Este recurso ya existe</Typography>
+              </Grid>
+            )}
+          </Grid>
         </DialogContent>
         <DialogActions>
           <Button
@@ -259,6 +269,13 @@ function Sala() {
 
       <Grid container direction='column' spacing={4}>
         {/*Input name*/}
+
+        <Grid item>
+          <Typography variant='h4'>
+            {id ? 'Editar sala' : 'Crear sala'}
+          </Typography>
+        </Grid>
+
         <Grid item>
           <TextField
             fullWidth
