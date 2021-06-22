@@ -98,6 +98,7 @@ function CalendarView({ roomProp }) {
         </Grid>
       </Grid>
       <Calendar
+        style={{ height: '80vh' }}
         views={['work_week', 'agenda']}
         defaultView='work_week'
         min={new Date(0, 0, 0, 8, 30, 0)}
