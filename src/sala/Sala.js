@@ -23,6 +23,7 @@ import {
   DialogActions
 } from '@material-ui/core';
 import { Delete, Save, Add, Edit } from '@material-ui/icons';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 /**
  * Componente Sala.js.
@@ -270,10 +271,20 @@ function Sala() {
       <Grid container direction='column' spacing={4}>
         {/*Input name*/}
 
-        <Grid item>
-          <Typography variant='h4'>
-            {id ? 'Editar sala' : 'Crear sala'}
-          </Typography>
+        <Grid item container justify='space-between'>
+          <Grid item>
+            <Typography variant='h4'>
+              {id ? 'Editar sala' : 'Crear sala'}
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Button
+              size='large'
+              startIcon={<ArrowBackIcon />}
+              onClick={() => history.push('/')}>
+              Volver
+            </Button>
+          </Grid>
         </Grid>
 
         <Grid item>

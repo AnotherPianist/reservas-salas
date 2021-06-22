@@ -5,16 +5,20 @@ import {
   ListItemText,
   Typography
 } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
 import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import EventView from '../calendar/EventView';
 import { db } from '../firebase';
 import useAuth from '../providers/Auth';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 function MisReservas() {
   const { user } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [show, setShow] = useState(false);
   const [eventSelected, setEventSelected] = useState();
+  const history = useHistory();
 
   useEffect(() => {
     db.collection('rooms')
@@ -49,8 +53,18 @@ function MisReservas() {
   return (
     <>
       <Grid container spacing={3} direction='column'>
-        <Grid item>
-          <Typography variant='h3'>Mis reservas</Typography>
+        <Grid item container justify='space-between'>
+          <Grid item>
+            <Typography variant='h4'>Mis reservas</Typography>
+          </Grid>
+          <Grid item>
+            <Button
+              size='large'
+              startIcon={<ArrowBackIcon />}
+              onClick={() => history.push('/')}>
+              Volver
+            </Button>
+          </Grid>
         </Grid>
         <Grid item>
           <List>

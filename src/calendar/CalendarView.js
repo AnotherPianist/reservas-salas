@@ -20,6 +20,7 @@ function CalendarView({ roomProp }) {
   const { roomId } = useParams();
   const history = useHistory();
   const room = roomProp ? roomProp : roomId;
+  const [roomName, setRoomName] = useState('');
   const [showCreateEventDialog, setShowCreateEventDialog] = useState(false);
   const [showEventDialogDetails, setShowEventDialogDetails] = useState(false);
   const [events, setEvents] = useState([]);
@@ -46,6 +47,14 @@ function CalendarView({ roomProp }) {
   };
 
   const localizer = momentLocalizer(moment);
+
+  useEffect(() =>
+    db
+      .collection('rooms')
+      .doc(room)
+      .get()
+      .then((doc) => setRoomName(doc.data().name))
+  );
 
   /**
    * UseEffect que se ejecuta cada vez que haya un cambio en la variable "room" y está
@@ -75,7 +84,10 @@ function CalendarView({ roomProp }) {
 
   return (
     <div>
-      <Grid container justify='flex-end' style={{ marginBottom: '2rem' }}>
+      <Grid container justify='space-between' style={{ marginBottom: '2rem' }}>
+        <Grid item>
+          <Typography variant='h4'>{`${roomName}`}</Typography>
+        </Grid>
         <Grid item>
           <Button
             size='large'
