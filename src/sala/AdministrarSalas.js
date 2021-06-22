@@ -26,8 +26,10 @@ import {
   Delete,
   ExpandMore,
   Add,
-  Edit
+  Edit,
+  Info
 } from '@material-ui/icons';
+import { withStyles } from '@material-ui/core/styles';
 import React from 'react';
 
 /**
@@ -194,6 +196,16 @@ function AdministrarSalas() {
     return false;
   }
 
+  const HtmlTooltip = withStyles((theme) => ({
+    tooltip: {
+      backgroundColor: '#f5f5f9',
+      color: 'rgba(0, 0, 0, 0.87)',
+      maxWidth: 220,
+      fontSize: theme.typography.pxToRem(12),
+      border: '1px solid #dadde9'
+    }
+  }))(Tooltip);
+
   return (
     <div style={{ marginTop: '2rem' }}>
       <Grid container spacing={3} direction='column'>
@@ -284,10 +296,9 @@ function AdministrarSalas() {
               {salasSearch.map((sala) => (
                 <TableRow key={sala.id}>
                   <TableCell>
-                    <Tooltip
-                      placement='right'
+                    <HtmlTooltip
                       title={
-                        <Table style={{ backgroundColor: 'white' }}>
+                        <Table>
                           <TableHead>
                             <TableRow>
                               <TableCell>Recurso</TableCell>
@@ -295,25 +306,33 @@ function AdministrarSalas() {
                             </TableRow>
                           </TableHead>
                           <TableBody>
-                            {resource.map((rec) =>
-                              rec.idRoom === sala.id ? (
-                                <TableRow key={rec.i}>
-                                  <TableCell>
-                                    <Typography>{rec.name}</Typography>
-                                  </TableCell>
-                                  <TableCell>
-                                    <Typography>
-                                      <Typography>{rec.quantity}</Typography>
-                                    </Typography>
-                                  </TableCell>
-                                </TableRow>
-                              ) : null
+                            {resource.map(
+                              (rec) =>
+                                rec.idRoom === sala.id && (
+                                  <TableRow key={rec.i}>
+                                    <TableCell>
+                                      <Typography>{rec.name}</Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                      <Typography>
+                                        <Typography>{rec.quantity}</Typography>
+                                      </Typography>
+                                    </TableCell>
+                                  </TableRow>
+                                )
                             )}
                           </TableBody>
                         </Table>
                       }>
-                      <Typography>{sala.name}</Typography>
-                    </Tooltip>
+                      <Grid container spacing={1}>
+                        <Grid item>
+                          <Typography>{sala.name}</Typography>
+                        </Grid>
+                        <Grid item>
+                          <Info fontSize='small' color='disabled' />
+                        </Grid>
+                      </Grid>
+                    </HtmlTooltip>
                   </TableCell>
                   <TableCell>
                     <Typography>{sala.description}</Typography>
