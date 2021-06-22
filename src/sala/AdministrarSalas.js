@@ -31,6 +31,7 @@ import {
 } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
 import React from 'react';
+import Swal from 'sweetalert2';
 
 /**
  * Componente AdministrarSalas.js
@@ -139,20 +140,33 @@ function AdministrarSalas() {
    * ésta tenga agregados.
    */
   function eliminarSala(sala) {
-    setSalas((prevRecursos) => prevRecursos.filter((el) => el !== sala));
-    setSalasSearch((prevRecursos) => prevRecursos.filter((el) => el !== sala));
-    const salaId = sala.id;
-    db.collection('rooms')
-      .doc(salaId)
-      .delete()
-      .then(() => {
-        db.collection('resources')
-          .where('idRoom', '==', salaId)
-          .get()
-          .then((querySnapshot) => {
-            querySnapshot.forEach((resource) => resource.ref.delete());
+    Swal.fire({
+      title: 'Eliminar sala',
+      text: `¿Está seguro que desea eliminar ${sala.name}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      confirmButtonText: 'Eliminar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setSalas((prevRecursos) => prevRecursos.filter((el) => el !== sala));
+        setSalasSearch((prevRecursos) =>
+          prevRecursos.filter((el) => el !== sala)
+        );
+        db.collection('rooms')
+          .doc(sala.id)
+          .delete()
+          .then(() => {
+            db.collection('resources')
+              .where('idRoom', '==', sala.id)
+              .get()
+              .then((querySnapshot) => {
+                querySnapshot.forEach((resource) => resource.ref.delete());
+              });
           });
-      });
+        Swal.fire('Eliminado', `${sala.name} ha sido eliminada.`, 'success');
+      }
+    });
   }
 
   /**

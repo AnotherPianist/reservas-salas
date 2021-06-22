@@ -13,6 +13,7 @@ import {
 } from '@material-ui/core';
 import { DatePicker } from '@material-ui/pickers';
 import React, { useState } from 'react';
+import Swal from 'sweetalert2';
 import { db } from '../firebase';
 import useAuth from '../providers/Auth';
 
@@ -64,6 +65,11 @@ function EventView({ close, show, event, roomId, selection }) {
     };
     db.collection('rooms').doc(roomId).collection('bookings').add(event);
     close();
+    Swal.fire(
+      'Reserva realizada',
+      `Tu reserva ${title} ha sido realizada con éxito`,
+      'success'
+    );
   }
 
   /**
@@ -71,23 +77,38 @@ function EventView({ close, show, event, roomId, selection }) {
    * "rooms" dado el id "roomId" dentro de la colección "bookings".
    */
   function handleEdit() {
-    const startDate = new Date(date);
-    startDate.setHours(...startHour.split(':'), 0);
-    const endDate = new Date(date);
-    endDate.setHours(...endHour.split(':'), 0);
-    const updatedEvent = {
-      username: event.username,
-      title: title,
-      details: details,
-      start: startDate,
-      end: endDate
-    };
-    db.collection('rooms')
-      .doc(roomId)
-      .collection('bookings')
-      .doc(event.id)
-      .update(updatedEvent);
     close();
+    Swal.fire({
+      title: 'Guardar cambios',
+      text: '¿Estás seguro que deseas guardar los cambios?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Guardar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const startDate = new Date(date);
+        startDate.setHours(...startHour.split(':'), 0);
+        const endDate = new Date(date);
+        endDate.setHours(...endHour.split(':'), 0);
+        const updatedEvent = {
+          username: event.username,
+          title: title,
+          details: details,
+          start: startDate,
+          end: endDate
+        };
+        db.collection('rooms')
+          .doc(roomId)
+          .collection('bookings')
+          .doc(event.id)
+          .update(updatedEvent);
+        Swal.fire(
+          'Cambios guardados!',
+          'Tus cambios han sido guardados correctamente.',
+          'success'
+        );
+      }
+    });
   }
 
   /**
@@ -95,12 +116,28 @@ function EventView({ close, show, event, roomId, selection }) {
    * que pertenece, eliminando la reserva de id "event.id".
    */
   function handleDelete() {
-    db.collection('rooms')
-      .doc(roomId)
-      .collection('bookings')
-      .doc(event.id)
-      .delete();
     close();
+    Swal.fire({
+      title: 'Eliminar reserva',
+      text: `¿Está seguro que desea eliminar ${title}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      confirmButtonText: 'Eliminar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        db.collection('rooms')
+          .doc(roomId)
+          .collection('bookings')
+          .doc(event.id)
+          .delete();
+        Swal.fire(
+          'Eliminado',
+          `La reserva ${title} ha sido eliminada.`,
+          'success'
+        );
+      }
+    });
   }
 
   /**
