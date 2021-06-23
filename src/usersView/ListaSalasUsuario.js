@@ -105,7 +105,7 @@ function ListaSalasUsuario() {
     if (searchOptions) {
       const temp = [];
       resource.forEach((rec) => {
-        if (checkSearch(rec)) temp.push(rec.idRom);
+        if (checkSearch(rec)) temp.push(rec.idRoom);
       });
 
       const aux = [];
@@ -159,14 +159,15 @@ function ListaSalasUsuario() {
    * parámetro.
    */
   function checkSearch(element) {
+    var bool = false;
     searchOptions.forEach((option) => {
       if (
         element.name === option.resource &&
         parseInt(element.quantity) >= parseInt(option.minAmount)
       )
-        return true;
+        bool = true;
     });
-    return false;
+    return bool;
   }
 
   const HtmlTooltip = withStyles((theme) => ({
@@ -224,6 +225,7 @@ function ListaSalasUsuario() {
                     <TextField
                       label='Cantidad mínima'
                       type='number'
+                      InputProps={{ inputProps: { min: 0 } }}
                       value={searchOption.minAmount}
                       onChange={(e) =>
                         editSearch(i, 'minAmount', e.target.value)
