@@ -19,6 +19,7 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { daysInWeek } from 'date-fns/fp';
 import { DatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
+import { GetApp } from '@material-ui/icons';
 moment.locale('es');
 
 /**
@@ -92,12 +93,22 @@ function CalendarView({ roomProp }) {
       });
     return unsubscribe;
   }, [room]);
-  function prettyDate2(date) {
+  /**
+   * Función que extrae la hora y minutos de una fecha dada.
+   * @param {*} date, Fecha a la cual se le extrae la hora y minutos.
+   * @returns retorna hora y minutos.
+   */
+  function hourMinute(date) {
     return date.toLocaleTimeString(navigator.language, {
       hour: '2-digit',
       minute: '2-digit'
     });
   }
+  /**
+   * Función que extrae el dia de la semana de una fecha.
+   * @param {*} date, Fecha a la cual se le extrae el dia.
+   * @returns retorna el nombre del día de la semana.
+   */
   function getDayDate(date) {
     let day = date.getDay();
     const days = [
@@ -111,6 +122,11 @@ function CalendarView({ roomProp }) {
     ];
     return days[day];
   }
+  /**
+   * Función que extrae el mes de  una fecha
+   * @param {*} date, Fecha a la cual se le extrae el mes
+   * @returns retorna el nombre del mes de la fecha
+   */
   function getNameMonth(date) {
     let month = date.getMonth();
     const months = [
@@ -129,20 +145,21 @@ function CalendarView({ roomProp }) {
     ];
     return months[month];
   }
-
+  /**
+   * Función que genera un .csv con las resevas dentro de un rango de fechas.
+   * @param {*} startDateExport,fecha inicial del rango.
+   * @param {*} endDateExport, fecha final del rango.
+   */
   function exportar(startDateExport, endDateExport) {
-    var Results = [['Fecha', 'Hora', 'Evento', 'Dueño']];
+    var Results = [['Fecha', 'Hora', 'Evento', 'Propietario']];
     events.forEach((element) => {
       let auxDate = new Date(
         element.start.getUTCFullYear(),
         element.start.getMonth(),
         element.start.getDate()
       );
-      console.log(
-        auxDate + '>=' + startDateExport + '&&' + auxDate + '<=' + endDateExport
-      );
       if (auxDate >= startDateExport && auxDate <= endDateExport) {
-        let hour = prettyDate2(element.start) + '-' + prettyDate2(element.end);
+        let hour = hourMinute(element.start) + '-' + hourMinute(element.end);
         let date =
           getDayDate(element.start) +
           ' ' +
@@ -237,7 +254,9 @@ function CalendarView({ roomProp }) {
       <DialogExport open={showExport} setOpen={() => setShowExport()} />
       <Grid container justify='space-between' style={{ marginBottom: '2rem' }}>
         <Grid item>
-          <Button onClick={() => setShowExport(true)}>exportar</Button>
+          <Button startIcon={<GetApp />} onClick={() => setShowExport(true)}>
+            exportar
+          </Button>
         </Grid>
         <Grid item>
           <Typography variant='h4'>{`${roomName}`}</Typography>
