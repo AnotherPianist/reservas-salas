@@ -6,9 +6,19 @@ import 'moment/locale/es';
 import EventView from './EventView';
 import { useHistory, useParams } from 'react-router-dom';
 import { db } from '../firebase';
-import { Button, Grid, Typography } from '@material-ui/core';
+import {
+  Button,
+  Grid,
+  Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
+} from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-
+import { daysInWeek } from 'date-fns/fp';
+import { DatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
+import DateFnsUtils from '@date-io/date-fns';
 moment.locale('es');
 
 /**
@@ -23,6 +33,7 @@ function CalendarView({ roomProp }) {
   const [roomName, setRoomName] = useState('');
   const [showCreateEventDialog, setShowCreateEventDialog] = useState(false);
   const [showEventDialogDetails, setShowEventDialogDetails] = useState(false);
+  const [showExport, setShowExport] = useState(false);
   const [events, setEvents] = useState([]);
   const [selection, setSelection] = useState();
   const [eventSelected, setEventSelected] = useState();
@@ -81,10 +92,153 @@ function CalendarView({ roomProp }) {
       });
     return unsubscribe;
   }, [room]);
+  function prettyDate2(date) {
+    return date.toLocaleTimeString(navigator.language, {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+  function getDayDate(date) {
+    let day = date.getDay();
+    const days = [
+      'Domingo',
+      'Lunes',
+      'Martes',
+      'Miércoles',
+      'Jueves',
+      'Viernes',
+      'Sabado'
+    ];
+    return days[day];
+  }
+  function getNameMonth(date) {
+    let month = date.getMonth();
+    const months = [
+      'Enero',
+      'Febrero',
+      'Marzo',
+      'Abril',
+      'Mayo',
+      'Junio',
+      'Julio',
+      'Agosto',
+      'Septiembre',
+      'Octubre',
+      'Noviembre',
+      'Diciembre'
+    ];
+    return months[month];
+  }
 
+  function exportar(startDateExport, endDateExport) {
+    var Results = [['Fecha', 'Hora', 'Evento', 'Dueño']];
+    events.forEach((element) => {
+      let auxDate = new Date(
+        element.start.getUTCFullYear(),
+        element.start.getMonth(),
+        element.start.getDate()
+      );
+      console.log(
+        auxDate + '>=' + startDateExport + '&&' + auxDate + '<=' + endDateExport
+      );
+      if (auxDate >= startDateExport && auxDate <= endDateExport) {
+        let hour = prettyDate2(element.start) + '-' + prettyDate2(element.end);
+        let date =
+          getDayDate(element.start) +
+          ' ' +
+          element.start.getDate() +
+          '' +
+          getNameMonth(element.start);
+        let detail = element.title;
+        let username = element.username;
+        Results.push([date, hour, detail, username]);
+      }
+    });
+
+    var CsvString = '';
+    Results.forEach(function (RowItem, RowIndex) {
+      RowItem.forEach(function (ColItem, ColIndex) {
+        CsvString += ColItem + ',';
+      });
+      CsvString += '\r\n';
+    });
+    CsvString = 'data:application/csv,' + encodeURIComponent(CsvString);
+    var x = document.createElement('A');
+    x.setAttribute('href', CsvString);
+    x.setAttribute('download', 'export.csv');
+    document.body.appendChild(x);
+    x.click();
+  }
+  function DialogExport({ open, setOpen }) {
+    const [startDateExport, SetStartDateExport] = useState();
+    const [endDateExport, SetEndDateExport] = useState();
+
+    return (
+      <MuiPickersUtilsProvider utils={DateFnsUtils}>
+        <Dialog open={open} onClose={() => setOpen(false)}>
+          <DialogTitle>Rango de fechas</DialogTitle>
+
+          <DialogContent>
+            <Grid container spacing={2}>
+              <Grid item>
+                <DatePicker
+                  fullWidth
+                  disableToolbar
+                  variant='inline'
+                  format='dd/MM/yyyy'
+                  label={'fecha inicio'}
+                  value={startDateExport ? startDateExport : null}
+                  onChange={(date) => {
+                    let auxDate = new Date(
+                      date.getUTCFullYear(),
+                      date.getMonth(),
+                      date.getDate()
+                    );
+                    SetStartDateExport(auxDate);
+                  }}
+                />
+              </Grid>
+              <Grid item>
+                <DatePicker
+                  fullWidth
+                  disableToolbar
+                  variant='inline'
+                  format='dd/MM/yyyy'
+                  label={'fecha fin'}
+                  value={endDateExport ? endDateExport : null}
+                  onChange={(date) => {
+                    let auxDate = new Date(
+                      date.getUTCFullYear(),
+                      date.getMonth(),
+                      date.getDate()
+                    );
+                    SetEndDateExport(auxDate);
+                  }}
+                />
+              </Grid>
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              disabled={!startDateExport || !endDateExport}
+              onClick={() => {
+                exportar(startDateExport, endDateExport);
+                setOpen(false);
+              }}>
+              aceptar
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </MuiPickersUtilsProvider>
+    );
+  }
   return (
     <div>
+      <DialogExport open={showExport} setOpen={() => setShowExport()} />
       <Grid container justify='space-between' style={{ marginBottom: '2rem' }}>
+        <Grid item>
+          <Button onClick={() => setShowExport(true)}>exportar</Button>
+        </Grid>
         <Grid item>
           <Typography variant='h4'>{`${roomName}`}</Typography>
         </Grid>
